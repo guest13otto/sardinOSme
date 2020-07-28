@@ -4,23 +4,23 @@ Gamepad Module
 Subscribe: None
 Publish Topics:
 
-/gamepad/movement
+gamepad.movement
     message: Vector6
 
-/gamepad/profile
+gamepad.profile
     message: String
 
-/gamepad/invert
+gamepad.invert
     message: Boolean
 
 '''
 
 
 # constants
-DeadZone_ThresholdL = 0.08
+DeadZone_ThresholdL = 0.11
 DeadZone_ThresholdR = 0.1
 Normalize_Constant = 32768
-Normalize_Constant_Z = 1024
+Normalize_Constant_Z = 1024 #1024 white controller ; 256 black controller
 Directional_BTN = {"BTN_NORTH", "BTN_WEST", "BTN_SOUTH", "BTN_EAST"}
 #BTN_TL, BTN_TR {0, 1}
 
@@ -32,7 +32,7 @@ ProfileDict = {'BTN_THUMB0': 'A',
 # variables
 from inputs import get_gamepad
 from pubsub import pub
-from ModuleBase import Module
+from Module_Base import Module
 
 
 def normalize(X, constant = Normalize_Constant):
@@ -106,11 +106,11 @@ class Gamepad(Module):
 
 
                 if self.control_invert == False:#tfront, tback
-                    self.movement_message = (-self.strafe, self.drive, self.yaw, -self.updown, self.tilt, 0)
+                    self.movement_message = (self.strafe, self.drive, self.yaw, self.updown, self.tilt, 0)
                 else:
-                    self.movement_message = (self.strafe, -self.drive, self.yaw,  -self.updown, -self.tilt, 0)
+                    self.movement_message = (-self.strafe, -self.drive, self.yaw,  -self.updown, -self.tilt, 0)
                 #pub_to_manager('movement', message = self.movement_message)
-                pub.sendMessage("/gamepad/movement", message = self.movement_message)
+                pub.sendMessage("gamepad.movement", message = self.movement_message)
 
         hatcode = event.code[0:8]
         controlcode = event.code
@@ -119,7 +119,7 @@ class Gamepad(Module):
                 self.thumb_profile_cycle = (self.thumb_profile_cycle+1)%4
             else:
                 self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%4
-            pub.sendMessage("/gamepad/profile", message = ProfileDict[str(event.code[:-1])+str(self.thumb_profile_cycle)])
+            pub.sendMessage("gamepad.profile", message = ProfileDict[str(event.code[:-1])+str(self.thumb_profile_cycle)])
 
         if controlcode == 'BTN_TL' and event.state != 0:
             pass #EM
@@ -134,4 +134,19 @@ class Gamepad(Module):
 
         if (controlcode == "BTN_WEST") and (event.state == 1):
             self.control_invert = not self.control_invert
-            pub.sendMessage("/gamepad/invert", message = self.control_invert) #For GUI
+            pub.sendMessage("gamepad.invert", message = self.control_invert) #For GUI
+
+
+if __name__ == "__main__":
+    import time
+    def debug_listener_movement(message):
+        print("movement", message)
+
+    def debug_listener_profile(message):
+        print("\t\t\t\t\t", "profile", message,"\n")
+        time.sleep(1)
+
+    debug = Gamepad()
+    debug.start(120)
+    pub.subscribe(debug_listener_movement, 'gamepad.movement')
+    pub.subscribe(debug_listener_profile, 'gamepad.profile')
