@@ -41,8 +41,9 @@ class CAN_Handler(Module):
         message = self.bus.recv(1)
 
 class __Test_Case_Send__(Module):
-    data = (0xff, 0x20, 7000>>8 & 0xFF, 7000 & 0xFF)
-    pub.sendMessage('cansend', data)
+    def run(self):
+        data = (0xff, 0x20, 7000>>8 & 0xFF, 7000 & 0xFF)
+        pub.sendMessage('cansend', data)
 
 if __name__ == "__main__":
 
