@@ -18,7 +18,7 @@ log.error:
 '''
 
 import can
-from ModuleBase import Module
+from Module_Base import Module
 from pubsub import pub
 
 class CAN_Handler(Module):
@@ -26,8 +26,8 @@ class CAN_Handler(Module):
         self.bus = can.interface.Bus(bustype = "socketcan", channel = "can0", bitrate = 250000)
         pub.subscribe(self.message_listener, "cansend")
 
-    def message_listener(self, adddress, data):
-        msg = can.Message(arbitration_id = address, data = data, is_extended_id = False)
+    def message_listener(self, data):
+        msg = can.Message(arbitration_id = eval(data[0]), data = data[1:], is_extended_id = False)
 
 
         try:
@@ -41,8 +41,8 @@ class CAN_Handler(Module):
         message = self.bus.recv(1)
 
 class __Test_Case_Send__(Module):
-    data = [0x20, 7000>>8 & 0xFF, 7000 & 0xFF]
-    pub.sendMessage('cansend', 0x0ff, data)
+    data = (0xff, 0x20, 7000>>8 & 0xFF, 7000 & 0xFF)
+    pub.sendMessage('cansend', data)
 
 if __name__ == "__main__":
 
