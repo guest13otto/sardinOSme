@@ -5,7 +5,7 @@ from threading import Event
 
 # https://stackoverflow.com/questions/2697039/python-equivalent-of-setinterval/48709380#48709380
 class Interval :
-    def __init__(self,interval,action) :
+    def __init__(self,interval,action):
         self.interval=interval
         self.action=action
         self.stopEvent=Event()
@@ -25,7 +25,7 @@ class Module:
     def __init__(self):
         self._running = False
         pass
-    
+
     def run(self):
         pass
 
