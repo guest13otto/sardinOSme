@@ -27,14 +27,14 @@ class CAN_Handler(Module):
         pub.subscribe(self.message_listener, "cansend")
 
     def message_listener(self, data):
-        msg = can.Message(arbitration_id = eval(data[0]), data = data[1:], is_extended_id = False)
+        msg = can.Message(arbitration_id = data[0], data = data[1:], is_extended_id = False)
 
 
         try:
             self.bus.send(msg)
             pub.sendMessage("log.sent" , message = msg)
 
-        except Can.CanError:
+        except can.CanError:
             pub.sendMessage("log.error" , message = msg)
 
     def run(self):
@@ -42,18 +42,21 @@ class CAN_Handler(Module):
 
 class __Test_Case_Send__(Module):
     def run(self):
-        data = (0xff, 0x20, 7000>>8 & 0xFF, 7000 & 0xFF)
-        pub.sendMessage('cansend', data)
+        data = (0xff, 0x20, 3000>>8 & 0xFF, 3000 & 0xFF)
+        pub.sendMessage('cansend', data = data)
 
 if __name__ == "__main__":
 
-    def logger(message):
-        print(message)
+    def logger_sent(message):
+        print("message sent: ", message)
+
+    def logger_error(message):
+        print("message not sent: ", message)
 
     can_handler = CAN_Handler()
     can_handler.start(10)
-    pub.subscribe(logger, "log.sent")
-    pub.subscribe(logger, "log.error")
+    pub.subscribe(logger_sent, "log.sent")
+    pub.subscribe(logger_error, "log.error")
 
     test_case_send = __Test_Case_Send__()
     test_case_send.start(10)
