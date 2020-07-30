@@ -15,6 +15,9 @@ log.sent:
 log.error:
     message
 
+log.receive:
+    message
+
 '''
 
 import can
@@ -39,6 +42,7 @@ class CAN_Handler(Module):
 
     def run(self):
         message = self.bus.recv(1)
+        pub.sendMessage("log.receive", message = message)
 
 class __Test_Case_Send__(Module):
     def run(self):
@@ -53,10 +57,15 @@ if __name__ == "__main__":
     def logger_error(message):
         print("message not sent: ", message)
 
+    def logger_receive(message):
+        print("message received: ", message)
+
     can_handler = CAN_Handler()
     can_handler.start(10)
-    pub.subscribe(logger_sent, "log.sent")
-    pub.subscribe(logger_error, "log.error")
 
     test_case_send = __Test_Case_Send__()
     test_case_send.start(10)
+
+    pub.subscribe(logger_sent, "log.sent")
+    pub.subscribe(logger_error, "log.error")
+    pub.subscribe(logger_receive, "log.receive")
