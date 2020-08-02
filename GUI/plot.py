@@ -1,5 +1,5 @@
 import pygame
-from axis import Axis
+from axis import Axis, display_text
 from bar import Bar
 
 
@@ -21,9 +21,10 @@ class Plot:
 
     def update(self, strafe, drive, yaw, tilt, updown1, updown2):
         values = [strafe, drive, yaw, tilt, updown1, updown2]
+        labels = ['strafe', 'drive', 'yaw', 'tilt', 'updown1', 'updown2']
         self.screen.fill((200, 200, 255))
 
         for i in range(6):
-            self.directions[i].draw(values[i])
+            self.directions[i].draw(values[i], labels[i])
 
         self.axes.draw()
