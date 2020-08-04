@@ -1,0 +1,9 @@
+ThrusterPower:
+  file: Thruster_Power
+  varclass: Thruster_Power
+  frequency: 10
+  CG: !!python/tuple [0,0,0]
+  ThrusterFL:
+    Invert: False
+    Position: !!python/tuple [0,0,0]
+    Direction: !!python/tuple [0,0,0]
