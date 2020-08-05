@@ -19,9 +19,9 @@ class Loader():
                     elif key == "frequency":
                         frequency = value
                     elif key[:8] == "Thruster":
-                        args = args + f"{key} = {value}"
+                        args = args + f"{key} = {value},"
                     else:
-                        args = args + f"{key}={value},"
+                        args = args + f"{key} = '{value}',"
 
                 try:
                     if args[-1] == ',':
@@ -30,6 +30,8 @@ class Loader():
                     pass
 
                 exec(f"from {file} import {varclass}")
+                _node = varclass + "(" + args + ")"
+                print(_node)
                 _node = eval(varclass + "(" + args + ")")
                 nodes.append({"node": _node, "class": varclass, "frequency": frequency, "args": args})
 
@@ -49,6 +51,7 @@ if __name__ == "__main__":
     nodes = Loader.load_all("Thruster.yaml")
 
     for n in nodes:
+
         n["node"].start(n["frequency"])
 
     #pub.subscribe(logger_ThrusterLoader_error, "log.ThrusterLoader.error")
