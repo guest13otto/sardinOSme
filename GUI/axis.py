@@ -41,7 +41,8 @@ class Axis(pygame.sprite.Sprite):
 
 def display_text(text, screen, x, y, alignment):
     black = (0, 0, 0)
-    font = pygame.font.Font('freesansbold.ttf', 10)
+    #font = pygame.font.Font('courier new.ttf', 12)
+    font = pygame.font.SysFont("Courier New", 14)
     textSurf = font.render(text, True, black)
     textRect = textSurf.get_rect()
     if alignment == 'left':
