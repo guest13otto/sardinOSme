@@ -10,9 +10,9 @@ class GUI(Module):
     def __init__(self):
         pygame.init()
         pygame.display.set_caption("ControlGUI(UWU")
-        screen = pygame.display.set_mode((1080, 720))
+        screen = pygame.display.set_mode((400, 300))
         self.clock = pygame.time.Clock()
-        self.plot = Plot(screen, 1080, 720)
+        self.plot = Plot(screen, 400, 300)
 
     def run(self):
         '''
@@ -24,7 +24,7 @@ class GUI(Module):
         updown2 = (cv2.getTrackbarPos('updown2', 'Track Bars') - 50) / 50
         '''
         self.clock.tick(30)
-        arr = [random.uniform(-1.0, 1.0) for i in range(6)]
+        arr = [random.uniform(-1.0, 1.0) for i in range(9)]
         #self.plot.update((random.uniform(-1.0, 1.0), 0.1, 0.2, -1, 0.1, 0.2))
         self.plot.update(arr)
         pygame.display.flip()
@@ -36,14 +36,14 @@ class GUI(Module):
 
 class TestCaseSend(Module):
     def run(self):
-        testcase = [random.uniform(-1.0, 1.0) for i in range(6)]
+        testcase = [random.uniform(-1.0, 1.0) for i in range(9)]
         print(testcase)
         pub.sendMessage('test.send', message=testcase)
 
 
 if __name__ == "__main__":
     gui = GUI()
-    gui.start(10)
+    gui.start(5)
 
     #test_case_send = TestCaseSend()
     #test_case_send.start(0.1)

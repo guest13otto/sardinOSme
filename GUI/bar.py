@@ -2,15 +2,14 @@ import pygame
 from axis import display_text
 
 class Bar(pygame.sprite.Sprite):
-    def __init__(self, order, screen, screen_width, screen_height, liftoff, bar_width):
+    def __init__(self, order, screen, screen_width, screen_height, xliftoff, yliftoff, bar_width):
         super().__init__()
         self.screen = screen
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.liftoff = liftoff
         self.bar_width = bar_width
-        self.xlim = (self.screen_width - self.liftoff * 2) / 2
-        self.y = screen_height - (liftoff + 2 * (6-order) * bar_width)
+        self.xlim = (self.screen_width - xliftoff * 2) / 2
+        self.y = screen_height - (yliftoff + 2 * (9-order) * bar_width)
         self.valuey = self.y + bar_width / 2
         self.labelx = 10
         apricot = (252, 200, 155)
@@ -19,7 +18,7 @@ class Bar(pygame.sprite.Sprite):
         twice3 = (254, 151, 164)
         twice4 = (254, 123, 163)
         twice5 = (255, 95, 162)
-        twice = [twice1, apricot, twice2, twice3, twice4, twice5]
+        twice = [twice1, twice2, twice3, twice4, twice5, twice4, twice3, twice2, twice1]
         red = (255, 0, 0)
         yellow = (255, 255, 0)
         green = (0, 255, 0)
@@ -39,7 +38,7 @@ class Bar(pygame.sprite.Sprite):
             x = self.screen_width/2 - (bar_length - 1)
             valuex = x - 5
             alignment = 'right'
-        display_text(label, self.screen, self.labelx, self.valuey, 'left')
+        display_text(label + ' ' + str('%.3f' % value), self.screen, self.labelx, self.valuey, 'left')
         rect = pygame.Rect(x, self.y, bar_length, self.bar_width)
         pygame.draw.rect(self.screen, self.colour, rect)
-        display_text(str(value), self.screen, valuex, self.valuey, alignment)
+        #display_text(str('%.3f'%value), self.screen, valuex, self.valuey, alignment)
