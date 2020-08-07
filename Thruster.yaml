@@ -1,0 +1,32 @@
+
+CG: 0,0,0
+ThrusterFL:
+  Name: ThrusterFL
+  Invert: False
+  Position: -0.168,0.176,0 # x, y, z metre
+  Direction: 0.707,0.707,0 # x, y, z magnitude
+ThrusterFR:
+  Name: ThrusterFR
+  Invert: False
+  Position: 0.168,0.176,0
+  Direction: -0.707,0.707,0
+ThrusterBL:
+  Name: ThrusterBL
+  Invert: False
+  Position: -0.168,-0.176,0
+  Direction: 0.707,-0.707,0
+ThrusterBR:
+  Name: ThrusterBR
+  Invert: False
+  Position: 0.168,-0.176,0
+  Direction: -0.707,-0.707,0
+ThrusterUF:
+  Name: ThrusterUF
+  Invert: False
+  Position: 0,0.1,0.097
+  Direction: 0,0,1
+ThrusterUB:
+  Name: ThrusterUB
+  Invert: False
+  Position: 0,-0.1,0.097
+  Direction: 0,0,1
