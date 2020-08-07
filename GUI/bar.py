@@ -14,7 +14,20 @@ class Bar(pygame.sprite.Sprite):
         self.valuey = self.y + bar_width / 2
         self.labelx = 10
         apricot = (252, 200, 155)
-        self.colour = apricot
+        twice1 = (252, 207, 166)
+        twice2 = (253, 179, 165)
+        twice3 = (254, 151, 164)
+        twice4 = (254, 123, 163)
+        twice5 = (255, 95, 162)
+        twice = [twice1, apricot, twice2, twice3, twice4, twice5]
+        red = (255, 0, 0)
+        yellow = (255, 255, 0)
+        green = (0, 255, 0)
+        cyan = (0, 255, 255)
+        blue = (0, 0, 255)
+        magenta = (255, 0, 255)
+        colours = [red, yellow, green, cyan, blue, magenta]
+        self.colour = twice[order]
 
     def draw(self, value, label):
         bar_length = abs(value) * (self.xlim / 1.1)
@@ -23,7 +36,7 @@ class Bar(pygame.sprite.Sprite):
             valuex = x + bar_length + 5
             alignment = 'left'
         else:
-            x = self.screen_width/2 - bar_length
+            x = self.screen_width/2 - (bar_length - 1)
             valuex = x - 5
             alignment = 'right'
         display_text(label, self.screen, self.labelx, self.valuey, 'left')

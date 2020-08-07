@@ -19,8 +19,8 @@ class Plot:
         updown2 = Bar(5, screen, screen_width, screen_height, self.liftoff, self.bar_width)
         self.directions = [strafe, drive, yaw, tilt, updown1, updown2]
 
-    def update(self, strafe, drive, yaw, tilt, updown1, updown2):
-        values = [strafe, drive, yaw, tilt, updown1, updown2]
+    def update(self, values):
+        #values = [strafe, drive, yaw, tilt, updown1, updown2]
         labels = ['strafe', 'drive', 'yaw', 'tilt', 'updown1', 'updown2']
         self.screen.fill((200, 200, 255))
 
