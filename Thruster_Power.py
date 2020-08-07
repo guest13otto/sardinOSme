@@ -59,16 +59,20 @@ class Thruster_Power(Module):
         pass
 class __Test_Case_Send__(Module):
     def run(self):
+        pub.sendMessage("command.movement", message = (1,0,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,1,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,1,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
         pub.sendMessage("command.movement", message = (0,0,0,0,1,0))
+        pub.sendMessage("command.movement", message = (0,0,0,0,0,1))
 
 if __name__ == "__main__":
     from Gamepad import Gamepad
     def Thruster_Power_Listener(message):
-
         print(message.reshape(1,6))
 
-    Gamepad = Gamepad()
-    Gamepad.start(100)
+    #Gamepad = Gamepad()
+    #Gamepad.start(100)
 
     Thruster_Power = Thruster_Power()
     Thruster_Power.start(100)

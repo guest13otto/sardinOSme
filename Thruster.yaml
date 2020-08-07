@@ -23,10 +23,10 @@ ThrusterBR:
 ThrusterUF:
   Name: ThrusterUF
   Invert: False
-  Position: 0,0.1,0.097
+  Position: 0,0.182,0.097
   Direction: 0,0,1
 ThrusterUB:
   Name: ThrusterUB
   Invert: False
-  Position: 0,-0.1,0.097
+  Position: 0,-0.182,0.097
   Direction: 0,0,1
