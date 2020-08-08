@@ -5,28 +5,34 @@ ThrusterFL:
   Invert: False
   Position: -0.168,0.176,0 # x, y, z metre
   Direction: 0.707,0.707,0 # x, y, z magnitude
+  Scale: 1.3815335
 ThrusterFR:
   Name: ThrusterFR
   Invert: False
   Position: 0.168,0.176,0
   Direction: -0.707,0.707,0
+  Scale: 1.3815335
 ThrusterBL:
   Name: ThrusterBL
   Invert: False
   Position: -0.168,-0.176,0
   Direction: 0.707,-0.707,0
+  Scale: 1.3815335
 ThrusterBR:
   Name: ThrusterBR
   Invert: False
   Position: 0.168,-0.176,0
   Direction: -0.707,-0.707,0
+  Scale: 1.3815335
 ThrusterUF:
   Name: ThrusterUF
   Invert: False
   Position: 0,0.182,0.097
   Direction: 0,0,1
+  Scale: 3.24725275
 ThrusterUB:
   Name: ThrusterUB
   Invert: False
   Position: 0,-0.182,0.097
   Direction: 0,0,1
+  Scale: 3.24725275
