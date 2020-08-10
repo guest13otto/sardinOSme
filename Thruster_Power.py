@@ -15,6 +15,9 @@ from pubsub import pub
 import numpy as np
 import yaml
 
+#Scale constants
+Normalize_Thrusters = (1.3815335, 3.24725275,  3.24725275)# FL, FR, BL, BR, UF, UB
+
 
 class Thruster_Power(Module):
     def __init__ (self):
@@ -45,35 +48,79 @@ class Thruster_Power(Module):
 
         ThrusterMatrixInv = np.linalg.pinv(self.ThrusterMatrix[0:6,1:7])
         finalList = ThrusterMatrixInv.dot(expectedResult)
-        #print(self.ThrusterMatrix)
+
+        #pub.sendMessage("Thruster.RAW", message = finalList)
 
         for counter, Thruster in enumerate(self.Thrusters):
+            finalList[counter,0] = finalList[counter,0] / Thruster["Scale"]
             if Thruster["Invert"] == True:
                 finalList[counter, 0] *= -1
 
-        pub.sendMessage("Thruster.Power", message = finalList)
+        pub.sendMessage("Thruster.RAW", message = finalList)
 
 
 
     def run(self):
         pass
-class __Test_Case_Send__(Module):
+class __Test_Case_Combo__(Module):
     def run(self):
+        combined = [(x,y,tz,y,tx) for x in List[0] for y in List[1] for tz in List[2] for y in List[3] for tx in List[4]]
+        for combo in combined:
+            if (combo[0] + combo[1] == 1  or combo[0] + combo[1] == -1 or (combo[0] == 0 and combo[1] == 0)) and (combo[2] + combo[4] == -1 \
+            or combo[2] + combo[4] == 1 or (combo[2] == 0 and combo[4] == 0)):
+                message = (combo[0], combo[1], combo[2], combo[3], combo[4], 0)
+                print(message)
+                pub.sendMessage("command.movement", message = message)
+
+        '''for counter, combo in enumerate(combinations(List, 6)):
+            combo = (combo[0], combo[1], combo[2], 0, 0, 0)
+            pub.sendMessage("command.movement", message = combo)'''
+
+class __Test_Case_Scaled__(Module):
+    def run(self):
+        pub.sendMessage("command.movement", message = (1,0,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,1,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,1,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
         pub.sendMessage("command.movement", message = (0,0,0,0,1,0))
+        pub.sendMessage("command.movement", message = (0,0,0,0,0,1))
+
 
 if __name__ == "__main__":
+    from itertools import combinations
     from Gamepad import Gamepad
-    def Thruster_Power_Listener(message):
 
-        print(message.reshape(1,6))
+    List = [(-1,0,1),(-1,0,1),(-1,0,1),(-1,0,1),(-1,0,1)]
+    FL_List, FR_List, BL_List, BR_List, UF_List, UB_List = [],[],[],[],[],[]
+
+    def Thruster_Power_Listener_Scaled(message):
+        print("message: ", message.reshape(1,6))
+
+
+    def Thruster_Power_Listener(message):
+        FL, FR, BL, BR, UF, UB = message
+        FL_List.append(FL)
+        FR_List.append(FR)
+        BL_List.append(BL)
+        BR_List.append(BR)
+        UF_List.append(UF)
+        UB_List.append(UB)
+        print(f"max FL: {max(FL_List)}, item: {len(FL_List)}")
+        print(f"max FR: {max(FR_List)}")
+        print(f"max BL: {max(BL_List)}")
+        print(f"max BR: {max(BR_List)}")
+        print(f"max UF: {max(UF_List)}")
+        print(f"max UB: {max(UB_List)}")
+
 
     Gamepad = Gamepad()
-    Gamepad.start(100)
+    #Gamepad.start(100)
 
     Thruster_Power = Thruster_Power()
-    Thruster_Power.start(100)
+    test_case_combo = __Test_Case_Combo__()
+    test_case_scaled = __Test_Case_Scaled__()
+    #test_case_scaled.start(1)
+    test_case_combo.start(1)
 
-    test_case_send = __Test_Case_Send__()
-    test_case_send.start(1)
-
-    pub.subscribe(Thruster_Power_Listener, "Thruster.Power")
+    pub.subscribe(Thruster_Power_Listener, "Thruster.RAW")
+    #pub.subscribe(Thruster_Power_Listener_Scaled, "Thruster.Power")

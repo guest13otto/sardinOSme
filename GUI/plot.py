@@ -25,7 +25,7 @@ class Plot:
 
     def update(self, values):
         #values = [strafe, drive, yaw, tilt, updown1, updown2]
-        labels = ['strafe', 'drive', 'yaw', 'tilt', 'ud1', 'ud2', 'tpos', 'tdir', 'ttor']
+        labels = ['strafe', 'drive', 'yaw', 'tilt', 'ud1', 'ud2', 'tpos', 'tdir', 'torque']
         self.screen.fill((200, 200, 255))
 
         for i in range(9):
