@@ -16,7 +16,8 @@ import numpy as np
 import yaml
 
 #Scale constants
-Normalize_Thrusters = (1.3815335, 3.24725275,  3.24725275)# FL, FR, BL, BR, UF, UB
+Scale_Constants = (2.33, 2.33,  3.3, 2, 1.65, 0)# strafe, drive, yaw, updown, tiltFB, tiltLR
+Backward_Thrust = 1.65
 
 
 class Thruster_Power(Module):
@@ -44,6 +45,13 @@ class Thruster_Power(Module):
 
     def command_movement(self, message):
         Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message
+
+        Strafe *= Scale_Constants[0]
+        Drive *= Scale_Constants[1]
+        Yaw *= Scale_Constants[2]
+        Updown *= Scale_Constants[3]
+        TiltFB *= Scale_Constants[4]
+
         expectedResult = np.array((Strafe, Drive, Updown, TiltFB, TiltLR, Yaw)).reshape(6,1)
 
         ThrusterMatrixInv = np.linalg.pinv(self.ThrusterMatrix[0:6,1:7])
@@ -52,11 +60,15 @@ class Thruster_Power(Module):
         #pub.sendMessage("Thruster.RAW", message = finalList)
 
         for counter, Thruster in enumerate(self.Thrusters):
-            finalList[counter,0] = finalList[counter,0] / Thruster["Scale"]
+            if finalList[counter, 0] < 0:
+                finalList[counter, 0] *= Backward_Thrust
+            #finalList[counter,0] = finalList[counter,0] / Thruster["Scale"]
             if Thruster["Invert"] == True:
                 finalList[counter, 0] *= -1
 
-        pub.sendMessage("Thruster.RAW", message = finalList)
+        print(finalList)
+
+        #pub.sendMessage("Thruster.Power", message = finalList)
 
 
 
@@ -78,12 +90,12 @@ class __Test_Case_Combo__(Module):
 
 class __Test_Case_Scaled__(Module):
     def run(self):
-        pub.sendMessage("command.movement", message = (1,0,0,0,0,0))
-        pub.sendMessage("command.movement", message = (0,1,0,0,0,0))
+        pub.sendMessage("command.movement", message = (1,1,0,0,0,0))
+        '''pub.sendMessage("command.movement", message = (0,1,0,0,0,0))
         pub.sendMessage("command.movement", message = (0,0,1,0,0,0))
         pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
         pub.sendMessage("command.movement", message = (0,0,0,0,1,0))
-        pub.sendMessage("command.movement", message = (0,0,0,0,0,1))
+        pub.sendMessage("command.movement", message = (0,0,0,0,0,1))'''
 
 
 if __name__ == "__main__":
@@ -119,8 +131,8 @@ if __name__ == "__main__":
     Thruster_Power = Thruster_Power()
     test_case_combo = __Test_Case_Combo__()
     test_case_scaled = __Test_Case_Scaled__()
-    #test_case_scaled.start(1)
-    test_case_combo.start(1)
+    test_case_scaled.start(1)
+    #test_case_combo.start(1)
 
-    pub.subscribe(Thruster_Power_Listener, "Thruster.RAW")
-    #pub.subscribe(Thruster_Power_Listener_Scaled, "Thruster.Power")
+    #pub.subscribe(Thruster_Power_Listener, "Thruster.RAW")
+    pub.subscribe(Thruster_Power_Listener_Scaled, "Thruster.Power")
