@@ -10,35 +10,49 @@ from Module_Base_Async import Module
 class test(Module):
     def __init__(self):
         super().__init__()                    #Must have this line
-
-    @Module.loop(1)                           #Add this decorator to method name run to allow it to loop
-    def run(self):                            #Loop functions must be name have the first three characters "run"
-        print("from test")
-
-    @Module.loop(2)                           #Argument to specify relative speed of run loops. run_another_loop loops 2x faster than run
-    def run_another_loop(self):
+                        
+    @Module.loop(2)                           #Add this decorator to allow methods with name that starts with "run" to loop
+    def run_another_loop(self):               #Loop functions must have the first three characters "run"
         print("from another loop")
 
-    @Module.loop(0.1)
-    def run_cancel(self):
-        self.cancel_all_local_task()          #End all loops in this object
+    @Module.loop(0.1)                         #Argument to specify relative speed of run loops. run_another_loop loops 2x faster than run
+    def run_useless(self):
+        pass                                  
 
+    def run(self):                            #Method called "run" specifically will loop by itself, with run speed multiplier of 1
+        print("from test")
 
+    def destroy(self):                        #Add this if there are any clean-up code that needs to run when Module is destroyed
+        print("Closed")
+
+-----------------------------------------------------------------------
 Run Modules in main like this:
-from Test import test
 
-test_object = test()         
-test_object.start(10)                         #10 represents 10 times per second
+from Test import test                                                #Import the Module made above
+
+test_object = test()
+another_test = AnotherModule()         
+test_object.start(10)                                                #10 represents 10 times per second
+another_test.start(10)
+AsyncModuleManager.register_modules(test_object, another_test)       #Must have this to work
 
 try:
-    loop.run_forever()
+    AsyncModuleManager.run_forever()                                 
 except KeyboardInterrupt:
+    pass
+except BaseException:
     pass
 finally:
     print("Closing Loop")
-    loop.close()
+    AsyncModuleManager.stop_all()
+-----------------------------------------------------------------------
+Pub commands to AsyncModuleManager:
+#Use within a Module
 
-
+pub.sendMessage("AsyncModuleManager", target = "othertest", command = "destroy")           #Destroy a active Module
+pub.sendMessage("AsyncModuleManager", target = "othertest", command = "restart")           #Restart a destroyed Module
+pub.sendMessage("AsyncModuleManager", target = "othertest.somefunc", command = "cancel")   #Cancel a running task
+pub.sendMessage("AsyncModuleManager", target = "othertest.somefunc", command = "start")    #Start a cancelled task
 -----------------------------------------------------------------------
 '''
 
@@ -50,20 +64,39 @@ class Module():
         self.inst = {}                        # {"Test" : <__main__.test object at 0x...>}
         #pub.subscribe(self.cancel_task_handler, self.__class__.__name__)
     
-    async def exec_periodically(self, wait_time, func):
+    async def exec_periodically(self, wait_time, func, special_run = False):
         while True:
             await asyncio.sleep(wait_time)
-            func(self)
+            if special_run:
+                func()
+            else:
+                func(self)
+
+
+
+
 
 
     @staticmethod
     def loop(speed_multiplier = 1):
-        def loop(func):
+        def outer(func):
             def wrapper(varclass, record_name, interval):
+                #print(func)
+                #print(varclass)
                 varclass.relative_speed_multiplier[record_name] = [func, speed_multiplier]
-                varclass.tasks[record_name] = asyncio.ensure_future(varclass.exec_periodically((1/varclass.relative_speed_multiplier[record_name][1])*(1/interval), varclass.relative_speed_multiplier[record_name][0]))
+                varclass.tasks[record_name] = asyncio.ensure_future(varclass.exec_periodically((1/varclass.relative_speed_multiplier[record_name][1])*(1/interval), func))
             return wrapper
-        return loop
+        return outer
+
+    def create_task(self, func_name, record_name, interval):
+        try:
+            getattr(self, func_name)(record_name, interval)
+        except:
+            if func_name == "run":
+                self.relative_speed_multiplier[record_name] = [getattr(self, "run"), 1]
+                self.tasks[record_name] = asyncio.ensure_future(self.exec_periodically(1/interval, getattr(self, "run"), special_run=True))
+            else:
+                getattr(self, func_name)()
 
     def start(self, interval):
         self.destroyed = False
@@ -71,133 +104,109 @@ class Module():
         self.run_funcs = [method for method in dir(self) if method[:3]=="run" and callable(getattr(self, method))]
         for func_name in self.run_funcs:
             record_name = str(self.__class__.__name__)+"."+func_name
-            try:
-                getattr(self, func_name)(record_name, interval)
-                #exec(f"self.{func_name}('{record_name}', {interval})")
-                #self.tasks[record_name] = asyncio.ensure_future(self.exec_periodically((1/self.relative_speed_multiplier[record_name][1])*(1/interval), self.relative_speed_multiplier[record_name][0]))
-            except:
-                getattr(self, func_name)()
-                #exec(f"self.{func_name}()")
-            finally:
-                self.inst[self.__class__.__name__] = self
-            #self.tasks[record_name] = asyncio.ensure_future(self.schedule_task_periodically((1/self.relative_speed_multiplier[record_name][1])*(1/interval), self.relative_speed_multiplier[record_name][0]))
-            
+            self.create_task(func_name, record_name, interval)
+                
+        self.inst[self.__class__.__name__] = self
+
+                       
     def destroy(self):
         pass
 
 
-    @staticmethod
-    def start_loop():
-        return asyncio.get_event_loop()
+class AsyncModuleManager():
+    inst = {}
+    relative_speed_multiplier = {}
+    tasks = {}
 
     '''
-    def cancel_local_task(self, task, check_clean_up = True):
-        if "." not in task:
-            task = self.__class__.__name__+"."+task
+    @classmethod
+    def start(cls, *args):
+        pub.subscribe(cls.module_command_handler, "AsyncModuleManager")
+        for module, interval in args:
+            module.start(interval)
+            cls.register_module(module)'''
 
-        
-        if not self.tasks[task].cancelled:
-            self.tasks[task].cancel()
-        else:
-            self.tasks[task] = None
-
-        if check_clean_up:
-            if False not in [task.cancelled() for task in self.tasks.values()]:
-                self.destroy()
-                self.destroyed = True
-
-        
-    def cancel_all_local_task(self):
-        for record_name in self.tasks:
-            self.cancel_local_task(record_name, check_clean_up=False)
-        if not self.destroyed:
-            self.destroy()
-            self.destroyed = True
-
-    def cancel_all_global_task(self, class_name):
-        pub.sendMessage(class_name, task = class_name)
-
-    def cancel_global_task(self, task):
-        pub.sendMessage(task[:task.find(".")], task = task)
-
-    def cancel_task_handler(self, task):
-        if "." in task:
-            self.cancel_local_task(task)
-        else:
-            self.cancel_all_local_task()'''
-
-
-
-
-class AsyncModuleManager(Module):
-    def __init__(self):
-        pub.subscribe(self.module_command_handler, self.__class__.__name__)
-        super().__init__()
-
-    def run(self):
-        pass
-
-    def module_command_handler(self, target, command):
+    @classmethod
+    def module_command_handler(cls, target, command):
         if command == "start" or command == "restart":
-            if "." in target:
-                self.start_task(target)
-            else:
-                self.restart_module(target)
+            try:
+                if "." in target:
+                    cls.start_task(target)
+                else:
+                    cls.restart_module(target)
+            except:
+                print("invalid Module or task")
         elif command == "cancel" or command == "destroy":
-            if "." in target:
-                self.cancel_task(target)
-            else:
-                self.destroy_module(target)
-    def accept_modules(self, *args):
+            try:
+                if "." in target:
+                    cls.cancel_task(target)
+                else:
+                    cls.destroy_module(target)
+            except:
+                print("invalid Module or task")
+    
+    @classmethod
+    def register_module(cls, module):
         try:
-            for module in args:
-                self.inst.update(module.inst)
-                self.tasks.update(module.tasks)
-                self.relative_speed_multiplier.update(module.relative_speed_multiplier)
+            cls.inst.update(module.inst)
+            cls.tasks.update(module.tasks)
+            cls.relative_speed_multiplier.update(module.relative_speed_multiplier)
         except:
             raise TypeError("Must provide Modules as arguments")
 
-    def update_manager(self, module):
-        self.inst.update(module.inst)
-        self.tasks.update(module.tasks)
-        self.relative_speed_multiplier.update(module.relative_speed_multiplier)
+    @classmethod
+    def register_modules(cls, *args):
+        for module in args:
+            cls.register_module(module)
 
-    def get_instance(self, module_or_method):
+    @classmethod
+    def update_manager(cls, module):
+        cls.inst.update(module.inst)
+        cls.tasks.update(module.tasks)
+        cls.relative_speed_multiplier.update(module.relative_speed_multiplier)
+
+    @classmethod
+    def get_instance(cls, module_or_method):
         if "." in module_or_method:
-            return self.inst[module_or_method[:module_or_method.find(".")]]   
+            return cls.inst[module_or_method[:module_or_method.find(".")]]   
         else:
-            return self.inst[module_or_method]
+            return cls.inst[module_or_method]
 
-    def get_method_name(self, task):
+    @classmethod
+    def get_method_name(cls, task):
         return task[task.find(".")+1:]
     
-    def start_task(self, task_name):
-        varclass = self.get_instance(task_name)
+    @classmethod
+    def start_task(cls, task_name):
+        varclass = cls.get_instance(task_name)
         if not varclass.destroyed:
             if varclass.tasks[task_name].cancelled():
-                getattr(varclass, self.get_method_name(task_name))(task_name, varclass.interval)
-                self.update_manager(varclass)
+                varclass.create_task(cls.get_method_name(task_name), task_name, varclass.interval)
+                cls.update_manager(varclass)
     
-    def cancel_task(self, method_name):   
-        varclass = self.get_instance(method_name)  
+    @classmethod
+    def cancel_task(cls, method_name):   
+        varclass = cls.get_instance(method_name)  
 
         if not varclass.tasks[method_name].cancelled():
             varclass.tasks[method_name].cancel()
-            self.update_manager(varclass)
+            cls.update_manager(varclass)
 
         if not varclass.destroyed:
             if False not in [task.cancelled() for task in varclass.tasks.values()]:
                 varclass.destroy()
                 varclass.destroyed = True
 
-    def restart_module(self, module_name):
-        varclass = self.get_instance(module_name)
+    @classmethod
+    def restart_module(cls, module_name):
+        varclass = cls.get_instance(module_name)
         if varclass.destroyed:
             varclass.start(varclass.interval)
-            self.update_manager(varclass)
+            cls.update_manager(varclass)
     
-    def destroy_module(self, module_name):
-        varclass = self.get_instance(module_name)
+    @classmethod
+    def destroy_module(cls, module_name):
+        varclass = cls.get_instance(module_name)
 
         for task in varclass.tasks.values():
             if not task.cancelled():
@@ -207,10 +216,21 @@ class AsyncModuleManager(Module):
             varclass.destroy()
             varclass.destroyed = True
 
-        self.update_manager(varclass)
+        cls.update_manager(varclass)
 
+    @staticmethod
+    def get_loop():
+        return asyncio.get_event_loop()
 
+    @classmethod
+    def run_forever(cls):
+        pub.subscribe(cls.module_command_handler, "AsyncModuleManager")
+        asyncio.get_event_loop().run_forever()
 
+    @classmethod
+    def stop_all(cls):
+        for module in cls.inst:
+            cls.destroy_module(module)
 
 
 
@@ -228,7 +248,6 @@ if __name__ == "__main__":
         def something_operation(self, num1, num2):
             return num1 *num1 + num2 * num2
         
-        @Module.loop()
         def run(self):
             print(self.var)
             #print(self.inst)
@@ -236,6 +255,7 @@ if __name__ == "__main__":
 
         @Module.loop(0.1)
         def run2(self):
+
             pass
             #self.cancel_all_global_task("Something2")
             #self.cancel_local_task("run")
@@ -257,8 +277,7 @@ if __name__ == "__main__":
             self.var = 0
             super().__init__()
 
-        @Module.loop()
-        def run1(self):
+        def run(self):
             self.var +=1
             #print(self.tasks)
 
@@ -269,17 +288,6 @@ if __name__ == "__main__":
 
         def destroy(self):
             print("Something2 destroyed")
-
-        '''
-        @Module.loop(0.1)
-        def run_canceller(self):
-            print("cancel starts")
-            self.cancel_all_global_task("Something")
-            #self.cancel_global_task("Something.run2")
-            print("task cancelled")
-            #self.cancel_local_task("run_canceller")
-            self.cancel_all_local_task()
-            print("cancelled self")'''
     
 
     class EXIT(Module):
@@ -294,19 +302,23 @@ if __name__ == "__main__":
         @Module.loop(0.2)
         def run_exit(self):
             if self.cancelled_counter < 2:
-                #pub.sendMessage("AsyncModuleManager", target = "Something2.run1", command = "cancel")
-                #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "cancel")
-                pub.sendMessage("AsyncModuleManager", target = "Something2", command = "cancel")
-                print("cancelled")
-                print("len", len(asyncio.Task.all_tasks()))
-                self.cancelled_counter +=1
+                try:
+                    #pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "cancel")
+                    #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "cancel")
+                    pub.sendMessage("AsyncModuleManager", target = "Something2", command = "cancel")
+                    print("cancelled")
+                    print("len", len(asyncio.Task.all_tasks()))
+                    self.cancelled_counter +=1
+                except Exception as e:
+                    print(e)
                 #print("exiting")
                 #exit()
 
         @Module.loop(0.15)
         def run_start(self):
-            pub.sendMessage("AsyncModuleManager", target = "Something2.run1", command = "start")
-            pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "start")
+            #pub.sendMessage("AsyncModuleManager", target = "Something2.run1", command = "start")
+            #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "start")
+            #pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "start")
             print("restarted")
             print("len", len(asyncio.Task.all_tasks()))
 
@@ -315,26 +327,24 @@ if __name__ == "__main__":
 
 
 
-    manager = AsyncModuleManager()
     s = Something()
     s2 = Something2()
     Exit = EXIT()
-    loop = Module.start_loop()
-    manager.start(0.0000000001)
     s.start(1)
     s2.start(1)
     Exit.start(1)
-    manager.accept_modules(s, s2, Exit)
-    
+    AsyncModuleManager.register_modules(s, s2, Exit)
 
     try:
-        loop.run_forever()
+        # loop.run_forever()
+        AsyncModuleManager.run_forever()
     except KeyboardInterrupt:
         pass
     except BaseException:
         pass
     finally:
         print("Closing Loop")
-        loop.close()
+        AsyncModuleManager.stop_all()
+
 
 
