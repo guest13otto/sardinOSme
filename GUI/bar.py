@@ -1,6 +1,7 @@
 import pygame
 from axis import display_text
 
+
 class Bar(pygame.sprite.Sprite):
     def __init__(self, order, screen, screen_width, screen_height, xliftoff, yliftoff, bar_width):
         super().__init__()
@@ -36,7 +37,7 @@ class Bar(pygame.sprite.Sprite):
         else:
             x = self.screen_width/2 - (bar_length - 1)
             value = '%.3f' % value
-        display_text(label, self.screen, self.labelx, self.valuey-7, 'left')
+        display_text(label, self.screen, self.labelx, self.valuey-7, 'left', 'black')
         rect = pygame.Rect(x, self.y, bar_length, self.bar_width)
         pygame.draw.rect(self.screen, self.colour, rect)
-        display_text(str(value), self.screen, self.labelx, self.valuey+7, 'left')
+        display_text(str(value), self.screen, self.labelx, self.valuey+7, 'left', 'black')

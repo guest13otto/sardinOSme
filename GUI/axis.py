@@ -27,11 +27,11 @@ class Axis(pygame.sprite.Sprite):
             x = self.xliftoff+xDiv*(i+1)
             pygame.draw.line(self.screen, magenta, (x, y-5), (x, y+5), axis_width)
             if i == 0:
-                display_text('-1', self.screen, x, y+15, 'center')
+                display_text('-1', self.screen, x, y+15, 'center', 'black')
             elif i == 10:
-                display_text('0', self.screen, x, y+15, 'center')
+                display_text('0', self.screen, x, y+15, 'center', 'black')
             elif i == 20:
-                display_text('1', self.screen, x, y+15, 'center')
+                display_text('1', self.screen, x, y+15, 'center', 'black')
 
         # draw y axis
         yStart = (self.screen_width/2, self.screen_height-self.yliftoff-self.ylim)
@@ -39,11 +39,12 @@ class Axis(pygame.sprite.Sprite):
         pygame.draw.line(self.screen, magenta, yStart, yEnd, axis_width)
 
 
-def display_text(text, screen, x, y, alignment):
+def display_text(text, screen, x, y, alignment, colour):
     black = (0, 0, 0)
-    #font = pygame.font.Font('courier new.ttf', 12)
+    if colour == 'black':
+        colour = black
     font = pygame.font.SysFont("Courier New", 14)
-    textSurf = font.render(text, True, black)
+    textSurf = font.render(text, True, colour)
     textRect = textSurf.get_rect()
     if alignment == 'left':
         textRect.left = x
