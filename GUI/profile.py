@@ -5,6 +5,7 @@ import time
 
 class Profile(pygame.sprite.Sprite):
     def __init__(self, screen, screen_width, screen_height):
+        super().__init__()
         self.profile = -1
         self.screen = screen
         self.screen_width = screen_width
@@ -23,10 +24,8 @@ class Profile(pygame.sprite.Sprite):
         if profile != self.profile:
             self.profile = profile
             self.screen.fill(self.colours[profile])
-            display_text(self.labels[profile], self.screen, self.screen_width/2, self.screen_height/2, 'center', 'black')
+            display_text(self.labels[profile], self.screen, self.screen_width/2, self.screen_height/2, 'center', 'b', 20)
             time.sleep(2)
             self.text = self.labels[profile]
 
-        display_text(self.text, self.screen, self.labelx, self.labely, 'right', self.colours[profile])
-
-
+        display_text(self.text, self.screen, self.labelx, self.labely, 'right', self.colours[profile], 14)
