@@ -15,8 +15,11 @@ class GUI(Module):
         self.clock = pygame.time.Clock()
         self.plot = Plot(screen, 400, 300)
         self.movement = [0 for i in range(11)]
+        self.thruster = [0 for i in range(6)]
         self.profile = -1
-        pub.subscribe(self.handler, 'test.send')
+        #pub.subscribe(self.test_handler, 'test.send')
+        pub.subscribe(self.movement_handler, 'gamepad.movement')
+        pub.subscribe(self.profile_handler, 'gamepad.profile')
 
     def run(self):
         self.clock.tick(30)
@@ -27,9 +30,18 @@ class GUI(Module):
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-    def handler(self, movement, profile):
+    def test_handler(self, movement, profile):
         self.movement = movement
         self.profile = profile
+
+    def movement_handler(self, message):
+        self.movement = message
+
+    def thruster_handler(self, message):
+        self.thruster = message
+
+    def profile_handler(self, message):
+        self.profile = message
 
 
 class TestCaseSend(Module):
@@ -40,23 +52,20 @@ class TestCaseSend(Module):
 
     def run(self):
         self.movement = [random.uniform(-1.0, 1.0) for i in range(11)]
+        pub.sendMessage('gamepad.movement', message=self.movement)
         print(self.movement)
 
     @Module.loop(0.25)
     def run2(self):
         self.profile = random.randint(0, 4)
-        print(self.profile)
-
-    @Module.loop(1)
-    def run_send(self):
-        pub.sendMessage('test.send', movement=self.movement, profile=self.profile)
+        pub.sendMessage('gamepad.profile', message=self.profile)
 
 
 if __name__ == "__main__":
     test_case_send = TestCaseSend()
     gui = GUI()
     test_case_send.start(1)
-    gui.start(1)
+    gui.start(30)
     AsyncModuleManager.register_modules(gui, test_case_send)
 
     try:

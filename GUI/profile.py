@@ -25,7 +25,7 @@ class Profile(pygame.sprite.Sprite):
             self.profile = profile
             self.screen.fill(self.colours[profile])
             display_text(self.labels[profile], self.screen, self.screen_width/2, self.screen_height/2, 'center', 'b', 20)
-            time.sleep(2)
+            time.sleep(20)
             self.text = self.labels[profile]
 
         display_text(self.text, self.screen, self.labelx, self.labely, 'right', self.colours[profile], 14)
