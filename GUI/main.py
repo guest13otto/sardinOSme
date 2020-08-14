@@ -1,5 +1,5 @@
 import pygame
-from Module_Base import Module
+from Module_Base_Async import Module, AsyncModuleManager
 from plot import Plot
 #from Gamepad import Gamepad
 from pubsub import pub
@@ -13,41 +13,60 @@ class GUI(Module):
         screen = pygame.display.set_mode((400, 300))
         self.clock = pygame.time.Clock()
         self.plot = Plot(screen, 400, 300)
+        self.arr = [0 for i in range(9)]
+        self.profile = -1
+        pub.subscribe(self.handler, 'test.send')
+        super().__init__()
 
+    #@Module.loop(1)
     def run(self):
-        '''
-        strafe = (cv2.getTrackbarPos('strafe', 'Track Bars') - 50) / 50
-        drive = (cv2.getTrackbarPos('drive', 'Track Bars') - 50) / 50
-        yaw = (cv2.getTrackbarPos('yaw', 'Track Bars') - 50) / 50
-        tilt = (cv2.getTrackbarPos('tilt', 'Track Bars') - 50) / 50
-        updown1 = (cv2.getTrackbarPos('updown1', 'Track Bars') - 50) / 50
-        updown2 = (cv2.getTrackbarPos('updown2', 'Track Bars') - 50) / 50
-        '''
         self.clock.tick(30)
-        arr = [random.uniform(-1.0, 1.0) for i in range(9)]
-        #self.plot.update((random.uniform(-1.0, 1.0), 0.1, 0.2, -1, 0.1, 0.2))
-        self.plot.update(arr)
+        self.plot.update(self.arr, self.profile)
         pygame.display.flip()
         for event in pygame.event.get():
             print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
 
+    def handler(self, arr, profile):
+        self.arr = arr
+        self.profile = profile
+
 
 class TestCaseSend(Module):
+    def __init__(self):
+        self.testcase = 0
+        self.profile = -1
+        super().__init__()
+
+    #@Module.loop(1)
     def run(self):
-        testcase = [random.uniform(-1.0, 1.0) for i in range(9)]
-        print(testcase)
-        pub.sendMessage('test.send', message=testcase)
+        self.testcase = [random.uniform(-1.0, 1.0) for i in range(9)]
+        print(self.testcase)
+
+    @Module.loop(0.25)
+    def run2(self):
+        self.profile = random.randint(0, 4)
+        print(self.profile)
+
+    @Module.loop(1)
+    def run_send(self):
+        pub.sendMessage('test.send', arr=self.testcase, profile=self.profile)
 
 
 if __name__ == "__main__":
+    test_case_send = TestCaseSend()
     gui = GUI()
-    gui.start(5)
+    test_case_send.start(1)
+    gui.start(1)
+    AsyncModuleManager.register_modules(gui, test_case_send)
 
-    #test_case_send = TestCaseSend()
-    #test_case_send.start(0.1)
-
-    #pub.subscribe(main(), 'test.send')
-
-
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()

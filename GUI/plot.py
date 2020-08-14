@@ -1,6 +1,7 @@
 import pygame
 from axis import Axis, display_text
 from bar import Bar
+from profile import Profile
 
 
 class Plot:
@@ -22,8 +23,9 @@ class Plot:
         tdir = Bar(7, screen, screen_width, screen_height, self.xliftoff, self.yliftoff, self.bar_width)
         ttor = Bar(8, screen, screen_width, screen_height, self.xliftoff, self.yliftoff, self.bar_width)
         self.directions = [strafe, drive, yaw, tilt, updown1, updown2, tpos, tdir, ttor]
+        self.profile = Profile(screen, screen_width, screen_height)
 
-    def update(self, values):
+    def update(self, values, profile):
         #values = [strafe, drive, yaw, tilt, updown1, updown2]
         labels = ['strafe', 'drive', 'yaw', 'tilt', 'ud1', 'ud2', 'tpos', 'tdir', 'torque']
         self.screen.fill((200, 200, 255))
@@ -32,3 +34,4 @@ class Plot:
             self.directions[i].draw(values[i], labels[i])
 
         self.axes.draw()
+        self.profile.popup(profile)
