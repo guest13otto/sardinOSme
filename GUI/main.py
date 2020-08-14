@@ -59,6 +59,7 @@ class TestCaseSend(Module):
     def run2(self):
         self.profile = random.randint(0, 4)
         pub.sendMessage('gamepad.profile', message=self.profile)
+        print(self.profile)
 
 
 if __name__ == "__main__":
