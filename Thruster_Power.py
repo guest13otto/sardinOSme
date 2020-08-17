@@ -17,7 +17,7 @@ import yaml
 
 #Scale constants
 #Scale_Constants = (1.714, 1.714,  0.585, 2, 0.22, 0)# strafe, drive, yaw, updown, tiltFB, tiltLR
-Scale_Constants = [1,1,1,1,1,1]
+Scale_Constants = [1,1,1,1,1]
 
 
 class Thruster_Power(Module):
@@ -42,10 +42,11 @@ class Thruster_Power(Module):
             ThrusterArray = np.concatenate((ThrusterDirection, Torque)).reshape(6,1)
             self.ThrusterMatrix = np.concatenate((self.ThrusterMatrix, ThrusterArray), axis = 1)
 
-        for i in range(6):
+        for i in range(5):
             message = [0] * 6
             message[i] = 1
-            pub.sendMessage("command.movement", message = message)
+            message = tuple(message)
+            self.command_movement(message)
 
         pub.subscribe(self.command_movement, "command.movement")
 
@@ -84,11 +85,11 @@ class Thruster_Power(Module):
                 finalList[counter, 0] *= -1
         #print("Normalize out: ", finalList.reshape(1,6))
 
-        if self.counter <= 6:
-            Scale_Constants[self.counter] = 1/max(abs(finalList))
-            print(max(abs(finalList)))
+        if self.counter <= 4:
+            Scale_Constants[self.counter] = float(1/max(abs(finalList)))
             self.counter += 1
-            pass
+            return
+        #print(Scale_Constants)
 
         if max(abs(finalList)) > 1:
             for counter, Thruster in enumerate(self.Thrusters):
@@ -97,10 +98,9 @@ class Thruster_Power(Module):
 
         pub.sendMessage("Thruster.Power", message = finalList)
 
-
-
     def run(self):
         pass
+
 class __Test_Case_Combo__(Module):
     def __init__(self):
         pub.subscribe(self.Thruster_Power_Listener_Max, "Thruster.Power")
@@ -136,10 +136,10 @@ class __Test_Case_Single__(Module):
 
     def Thruster_Power_Listener_Single(self, message):
         print("Test Case: ", expectedResult.reshape(1,6))
-        print("truncate out: ", message.reshape(1,6))
+        print("message: ", message.reshape(1,6))
 
     def run(self):
-        pub.sendMessage("command.movement", message = (0,1,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,0,0,1,0))
 
 
 if __name__ == "__main__":
