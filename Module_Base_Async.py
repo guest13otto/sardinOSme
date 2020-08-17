@@ -120,6 +120,7 @@ class AsyncModuleManager():
     inst = {}
     relative_speed_multiplier = {}
     tasks = {}
+    cancelling = []
 
     '''
     @classmethod
@@ -193,11 +194,13 @@ class AsyncModuleManager():
         if not varclass.tasks[method_name].cancelled():
             varclass.tasks[method_name].cancel()
             varclass.task_cleanup(method_name)
+            cls.cancelling.append(varclass.tasks[method_name])
             cls.update_manager(varclass)
 
         if not varclass.destroyed:
-            if False not in [task.cancelled() for task in varclass.tasks.values()]:
+            if False not in [non_cancelling_task.cancelled() for non_cancelling_task in varclass.tasks.values() if non_cancelling_task not in cls.cancelling]:
                 varclass.destroy()
+                cls.cancelling = []
                 varclass.destroyed = True
 
     @classmethod
@@ -306,7 +309,7 @@ if __name__ == "__main__":
         def run_exit(self):
             if self.cancelled_counter < 2:
                 try:
-                    #pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "cancel")
+                    pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "cancel")
                     #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "cancel")
                     pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "cancel")
                     print("cancelled")
@@ -322,7 +325,7 @@ if __name__ == "__main__":
             #pub.sendMessage("AsyncModuleManager", target = "Something2.run1", command = "start")
             #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "start")
             #pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "start")
-            pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "start")
+            pub.sendMessage("AsyncModuleManager", target = "Something2", command = "start")
             print("restarted")
             print("len", len(asyncio.Task.all_tasks()))
 
