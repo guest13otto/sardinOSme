@@ -42,11 +42,11 @@ class Thruster_Power(Module):
             ThrusterArray = np.concatenate((ThrusterDirection, Torque)).reshape(6,1)
             self.ThrusterMatrix = np.concatenate((self.ThrusterMatrix, ThrusterArray), axis = 1)
 
-        for i in range(4):
+        for i in range(5):
             message = [0] * 6
             message[i] = -1
-            message = tuple(message)
-            #self.command_movement(message)
+            self.gamepadScaleConstant(message)
+        #self.gamepadScaleConstant(message = [0,0,0,1,0,0])
 
         pub.subscribe(self.command_movement, "command.movement")
 
@@ -97,8 +97,18 @@ class Thruster_Power(Module):
             print('gamepadScaled out :', gamepadScaled)
         return gamepadScaled
 
-    def gamepadScaleConstant(self, finalList):
-        return finalList
+    def gamepadScaleConstant(self, message):
+        print(message)
+        if Print:
+            print("Test case: ", message)
+        Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message
+        expectedResult = np.array((Strafe, Drive, Updown, TiltFB, TiltLR, Yaw)).reshape(6,1)
+        finalList = self.pseudoInv(expectedResult)
+        finalList = self.directionScale(finalList)
+        for counter, dof in enumerate(message):
+            if dof != 0:
+                Scale_Constants[counter] = float(1/max(abs(finalList)))
+        print(Scale_Constants)
 
     def command_movement(self, message):
         if Print:
@@ -107,17 +117,10 @@ class Thruster_Power(Module):
         message = self.gamepadScale(message)
         Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message
         expectedResult = np.array((Strafe, Drive, Updown, TiltFB, TiltLR, Yaw)).reshape(6,1)
-
         finalList = self.pseudoInv(expectedResult)
-
         finalList = self.directionScale(finalList)
-
         finalList = self.invert(finalList)
-
-        #Scale_Constants[self.counter] = float(1/max(abs(finalList)))
-
-        finalList = self.truncate(finalList)
-
+        #finalList = self.truncate(finalList)
 
         pub.sendMessage("Thruster.Power", message = finalList)
 
@@ -133,7 +136,7 @@ class __Test_Case_Combo__(Module):
     def Thruster_Power_Listener_Max(self, message):
         FL, FR, BL, BR, UF, UB = message
         self.FL_List.append(FL), self.FR_List.append(FR), self.BL_List.append(BL), self.BR_List.append(BR), self.UF_List.append(UF), self.UB_List.append(UB)
-        print(f"max FL: {float(max(np.abs(self.FL_List)))}, test case: {expectedResult.reshape(1,6)}, item: {len(self.FL_List)}")
+        print(f"max FL: {float(max(np.abs(self.FL_List)))}, combo: {self.message}, item: {len(self.FL_List)}")
         print(f"max FR: {float(max(np.abs(self.FR_List)))}")
         print(f"max BL: {float(max(np.abs(self.BL_List)))}")
         print(f"max BR: {float(max(np.abs(self.BR_List)))}")
@@ -143,10 +146,10 @@ class __Test_Case_Combo__(Module):
     def run(self):
         combined = ((x,y,tz,y,tx) for x in self.List[0] for y in self.List[1] for tz in self.List[2] for y in self.List[3] for tx in self.List[4])
         for combo in combined:
-            if (combo[0] + combo[1] == 1  or combo[0] + combo[1] == -1 or (combo[0] == 0 and combo[1] == 0)) and (combo[2] + combo[4] == -1 \
-            or combo[2] + combo[4] == 1 or (combo[2] == 0 and combo[4] == 0)):
-                message = (combo[0], combo[1], combo[2], combo[3], combo[4], 0)
-                pub.sendMessage("command.movement", message = message)
+            '''if (combo[0] + combo[1] == 1  or combo[0] + combo[1] == -1 or (combo[0] == 0 and combo[1] == 0)) and (combo[2] + combo[4] == -1 \
+            or combo[2] + combo[4] == 1 or (combo[2] == 0 and combo[4] == 0)):'''
+            self.message = (combo[0], combo[1], combo[2], combo[3], combo[4], 0)
+            pub.sendMessage("command.movement", message = self.message)
         self.stop()
 
 class __Test_Case_Single__(Module):
@@ -158,15 +161,14 @@ class __Test_Case_Single__(Module):
         print("message: ", message.reshape(1,6))
 
     def run(self):
-        pub.sendMessage("command.movement", message = (0,1,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
         self.stop()
 
 
 if __name__ == "__main__":
-    Print = True
+    Print = False
     from itertools import combinations
     from Gamepad import Gamepad
-
 
     Gamepad = Gamepad()
     #Gamepad.start(1)
