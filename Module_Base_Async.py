@@ -76,17 +76,19 @@ class Module():
 
 
 
-
     @staticmethod
     def loop(speed_multiplier = 1):
         def outer(func):
             def wrapper(varclass, record_name, interval):
-                #print(func)
-                #print(varclass)
                 varclass.relative_speed_multiplier[record_name] = [func, speed_multiplier]
                 varclass.tasks[record_name] = asyncio.ensure_future(varclass.exec_periodically((1/varclass.relative_speed_multiplier[record_name][1])*(1/interval), func))
             return wrapper
         return outer
+
+    def task_cleanup(self, task_name):
+        cancel_task_name = "cancel_"+task_name[task_name.find(".")+1:]
+        if hasattr(self, cancel_task_name):
+            getattr(self, cancel_task_name)()
 
     def create_task(self, func_name, record_name, interval):
         try:
@@ -98,13 +100,14 @@ class Module():
             else:
                 getattr(self, func_name)()
 
+
     def start(self, interval):
         self.destroyed = False
         self.interval = interval
         self.run_funcs = [method for method in dir(self) if method[:3]=="run" and callable(getattr(self, method))]
         for func_name in self.run_funcs:
-            record_name = str(self.__class__.__name__)+"."+func_name
-            self.create_task(func_name, record_name, interval)
+            run_record_name = str(self.__class__.__name__)+"."+func_name
+            self.create_task(func_name, run_record_name, interval)
                 
         self.inst[self.__class__.__name__] = self
 
@@ -117,6 +120,7 @@ class AsyncModuleManager():
     inst = {}
     relative_speed_multiplier = {}
     tasks = {}
+    cancelling = []
 
     '''
     @classmethod
@@ -128,22 +132,21 @@ class AsyncModuleManager():
 
     @classmethod
     def module_command_handler(cls, target, command):
-        if command == "start" or command == "restart":
-            try:
+        try:
+            if command == "start" or command == "restart":
                 if "." in target:
                     cls.start_task(target)
                 else:
                     cls.restart_module(target)
-            except:
-                print("invalid Module or task")
-        elif command == "cancel" or command == "destroy":
-            try:
+            elif command == "cancel" or command == "destroy":
                 if "." in target:
                     cls.cancel_task(target)
                 else:
                     cls.destroy_module(target)
-            except:
-                print("invalid Module or task")
+            else:
+                print(f"Invalid command sent: {command}")
+        except:
+            print(f"An error occured when trying to send [command: {command}] to [target: {target}]")
     
     @classmethod
     def register_module(cls, module):
@@ -190,11 +193,14 @@ class AsyncModuleManager():
 
         if not varclass.tasks[method_name].cancelled():
             varclass.tasks[method_name].cancel()
+            varclass.task_cleanup(method_name)
+            cls.cancelling.append(varclass.tasks[method_name])
             cls.update_manager(varclass)
 
         if not varclass.destroyed:
-            if False not in [task.cancelled() for task in varclass.tasks.values()]:
+            if False not in [non_cancelling_task.cancelled() for non_cancelling_task in varclass.tasks.values() if non_cancelling_task not in cls.cancelling]:
                 varclass.destroy()
+                cls.cancelling = []
                 varclass.destroyed = True
 
     @classmethod
@@ -208,19 +214,16 @@ class AsyncModuleManager():
     def destroy_module(cls, module_name):
         varclass = cls.get_instance(module_name)
 
-        for task in varclass.tasks.values():
+        for task_name, task in varclass.tasks.items():
             if not task.cancelled():
                 task.cancel()
+                varclass.task_cleanup(task_name)
 
         if not varclass.destroyed:
             varclass.destroy()
             varclass.destroyed = True
 
         cls.update_manager(varclass)
-
-    @staticmethod
-    def get_loop():
-        return asyncio.get_event_loop()
 
     @classmethod
     def run_forever(cls):
@@ -255,11 +258,8 @@ if __name__ == "__main__":
 
         @Module.loop(0.1)
         def run2(self):
-
             pass
-            #self.cancel_all_global_task("Something2")
-            #self.cancel_local_task("run")
-            #self.cancel_local_task("run2")
+
 
 
         def handler(self, var):
@@ -286,6 +286,12 @@ if __name__ == "__main__":
             pub.sendMessage("topic", var = self.var)
             #self.test(self.run1)
 
+        def cancel_run2(self):
+            print("Something2.run2 cancel cleanup done")
+
+        def cancel_run(self):
+            print("Something2.run cancel cleanup done")
+
         def destroy(self):
             print("Something2 destroyed")
     
@@ -303,9 +309,9 @@ if __name__ == "__main__":
         def run_exit(self):
             if self.cancelled_counter < 2:
                 try:
-                    #pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "cancel")
+                    pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "cancel")
                     #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "cancel")
-                    pub.sendMessage("AsyncModuleManager", target = "Something2", command = "cancel")
+                    pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "cancel")
                     print("cancelled")
                     print("len", len(asyncio.Task.all_tasks()))
                     self.cancelled_counter +=1
@@ -319,6 +325,7 @@ if __name__ == "__main__":
             #pub.sendMessage("AsyncModuleManager", target = "Something2.run1", command = "start")
             #pub.sendMessage("AsyncModuleManager", target = "Something2.run2", command = "start")
             #pub.sendMessage("AsyncModuleManager", target = "Something2.run", command = "start")
+            pub.sendMessage("AsyncModuleManager", target = "Something2", command = "start")
             print("restarted")
             print("len", len(asyncio.Task.all_tasks()))
 
@@ -336,7 +343,6 @@ if __name__ == "__main__":
     AsyncModuleManager.register_modules(s, s2, Exit)
 
     try:
-        # loop.run_forever()
         AsyncModuleManager.run_forever()
     except KeyboardInterrupt:
         pass
