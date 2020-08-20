@@ -98,7 +98,7 @@ class Thruster_Power(Module):
         return gamepadScaled
 
     def gamepadScaleConstant(self, message):
-        print(message)
+        #print(message)
         if Print:
             print("Test case: ", message)
         Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message
@@ -108,7 +108,7 @@ class Thruster_Power(Module):
         for counter, dof in enumerate(message):
             if dof != 0:
                 Scale_Constants[counter] = float(1/max(abs(finalList)))
-        print(Scale_Constants)
+        #print(Scale_Constants)
 
     def command_movement(self, message):
         if Print:
