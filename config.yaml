@@ -33,12 +33,12 @@ ProfileD:
 ThrusterPower:
   file: Thruster_Power
   varclass: Thruster_Power
-  frequency: 60
+  frequency: 1
 Thrusters:
   file: Thrusters
   varclass: Thrusters
-  frequency: 60
-CAN_Handler:
-  file: CAN_Handler
-  varclass: CAN_Handler
-  frequency: 60
+  frequency: 10
+#CAN_Handler:
+#  file: CAN_Handler
+#  varclass: CAN_Handler
+#  frequency: 100

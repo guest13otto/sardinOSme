@@ -61,10 +61,15 @@ class __Test_Case_Send__(Module):
         print(f"message: ", message)
 
     def run(self):
-        pub.sendMessage("gamepad.movement", message = (0.2,0,0,0,0,0))
-        pub.sendMessage("gamepad.profile", message = 'A')
+        pass
+        #pub.sendMessage("gamepad.movement", message = (0.2,0,0,0,0,0))
+        #pub.sendMessage("gamepad.profile", message = 'A')
 
 if __name__ == "__main__":
+    from Gamepad import Gamepad
+    Gamepad = Gamepad()
+    Gamepad.start(100)
+
     __test_case_send__ = __Test_Case_Send__()
     __test_case_send__.start(1)
 
