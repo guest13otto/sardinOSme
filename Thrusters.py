@@ -1,3 +1,18 @@
+'''
+Subscribe Topics:
+
+Thruster.Power
+    message: FL, FR, BL, BR, BL, UF, UB <-1, 1>
+
+Publish Topics:
+
+can.send
+    address <hexadecimal>
+    data <bytearray>
+
+'''
+
+
 from Module_Base import Module
 from pubsub import pub
 import yaml
@@ -62,11 +77,11 @@ class __Test_Case_Send__(Module):
         pub.subscribe(self.can_send_listener, "can.send")
 
     def can_send_listener(self, address, data):
-        pass
-        #print(f"address: {address}, data: {data}")
+        print(f"address: {address}, data(binary): {data}, data(int): {data[1] << 8| data[2]}")
 
     def run(self):
-        pub.sendMessage("Thruster.Power", message = (-0.001,0,0,0,0,0))
+        pub.sendMessage("Thruster.Power", message = (0.5,1,1,1,1,1))
+        self.stop()
 
 if __name__ == "__main__":
     from Gamepad import Gamepad

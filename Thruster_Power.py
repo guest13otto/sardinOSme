@@ -2,12 +2,12 @@
 Subcribe Topics:
 
 command.movement
-    vector6: Strafe, Drive, Yaw, UpDown, TiltFB, TiltLR
+    message: Strafe, Drive, Yaw, UpDown, TiltFB, TiltLR <Vector6: -1, 1>
 
 Publish Topics
 
 Thruster.Power
-    vector6: Strafe, Drive, UpDown, TiltFB, TiltLR, Yaw
+    messsage: FL, FR, BL, BR, UF, UB <-1, 1>
 '''
 
 from Module_Base import Module
@@ -16,7 +16,7 @@ import numpy as np
 import yaml
 
 #Scale constants
-Scale_Constants = [1,1,1,1,1]
+Scale_Constants = [1,1,1,1,1,1]
 Print = False
 
 
@@ -42,7 +42,7 @@ class Thruster_Power(Module):
             ThrusterArray = np.concatenate((ThrusterDirection, Torque)).reshape(6,1)
             self.ThrusterMatrix = np.concatenate((self.ThrusterMatrix, ThrusterArray), axis = 1)
 
-        for i in range(5):
+        for i in range(6):
             message = [0] * 6
             message[i] = -1
             self.gamepadScaleConstant(message)
@@ -91,8 +91,8 @@ class Thruster_Power(Module):
     def gamepadScale(self, message):
         gamepadScaled = list(message)
         for counter, dof in enumerate(gamepadScaled):
-            if counter != 5:
-                gamepadScaled[counter] *= Scale_Constants[counter]
+            #if counter != 5:
+            gamepadScaled[counter] *= Scale_Constants[counter]
         if Print:
             print('gamepadScaled out :', gamepadScaled)
         return gamepadScaled
@@ -106,7 +106,7 @@ class Thruster_Power(Module):
         finalList = self.pseudoInv(expectedResult)
         finalList = self.directionScale(finalList)
         for counter, dof in enumerate(message):
-            if dof != 0:
+            if dof != 0 and max(abs(finalList)) != 0:
                 Scale_Constants[counter] = float(1/max(abs(finalList)))
         #print(Scale_Constants)
 
@@ -157,11 +157,11 @@ class __Test_Case_Single__(Module):
         pub.subscribe(self.Thruster_Power_Listener_Single, "Thruster.Power")
 
     def Thruster_Power_Listener_Single(self, message):
-        #print(f"Scale Constants: {Scale_Constants}")
+        print(f"Scale Constants: {Scale_Constants}")
         print("message: ", message.reshape(1,6))
 
     def run(self):
-        pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
+        pub.sendMessage("command.movement", message = (0,0,0,0,0,1))
         self.stop()
 
 
