@@ -19,8 +19,17 @@ class Thrusters(Module):
         self.Thrusters = [self.ThrusterFL, self.ThrusterFR, self.ThrusterBL, self.ThrusterBR, self.ThrusterUF, self.ThrusterUB]
         #print(f"rate: {self.rate}")
 
+    @staticmethod
+    def valmap(value, istart, istop, ostart, ostop):
+      return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
+
     def listener(self, message):
-        self.target_power = message
+        self.target_power = list(message)
+        for counter, power in enumerate(self.target_power):
+            if power > 0:
+                self.target_power[counter] = self.valmap(power, 0, 1, self.Thrusters[counter]["Deadzone"], 1)
+            elif power < 0:
+                self.target_power[counter] = self.valmap(power, 0, -1, -self.Thrusters[counter]["Deadzone"], -1)
 
     def run(self):
         self.rate *= self.interval
@@ -41,21 +50,23 @@ class Thrusters(Module):
             else:
                 self.output_power[counter] = int(self.output_power[counter]*32768)
 
+            pub.sendMessage("can.send", address = self.Thrusters[counter]["Address"], data = [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff])
         #print(f"difference: {self.difference}")
         #print(f"current_power: {self.current_power}")
         #print(f"output_power: {self.output_power}")
         #print(self.Thrusters[0]["Address"])
-            pub.sendMessage("can.send", address = self.Thrusters[counter]["Address"], data = [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff])
+
 
 class __Test_Case_Send__(Module):
     def __init__(self):
         pub.subscribe(self.can_send_listener, "can.send")
 
     def can_send_listener(self, address, data):
-        print(f"address: {address}, data: {data}")
+        pass
+        #print(f"address: {address}, data: {data}")
 
     def run(self):
-        pub.sendMessage("Thruster.Power", message = (1,0,0,0,0,0))
+        pub.sendMessage("Thruster.Power", message = (-0.001,0,0,0,0,0))
 
 if __name__ == "__main__":
     from Gamepad import Gamepad

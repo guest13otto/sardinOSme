@@ -10,6 +10,7 @@ ThrusterFL:
   Scale: 3
   PositiveScale: 1
   NegativeScale: 1.65
+  Deadzone: 0.1
 ThrusterFR:
   Name: ThrusterFR
   Address: 0x11
@@ -19,6 +20,7 @@ ThrusterFR:
   Scale: 3
   PositiveScale: 1
   NegativeScale: 1.65
+  Deadzone: 0.1
 ThrusterBL:
   Name: ThrusterBL
   Address: 0x11
@@ -28,6 +30,7 @@ ThrusterBL:
   Scale: 3
   PositiveScale: 1
   NegativeScale: 1.65
+  Deadzone: 0.1
 ThrusterBR:
   Name: ThrusterBR
   Address: 0x11
@@ -37,6 +40,7 @@ ThrusterBR:
   Scale: 3
   PositiveScale: 1
   NegativeScale: 1.65
+  Deadzone: 0.1
 ThrusterUF:
   Name: ThrusterUF
   Address: 0x11
@@ -46,6 +50,7 @@ ThrusterUF:
   Scale: 2.65
   PositiveScale: 0.9
   NegativeScale: 1.45
+  Deadzone: 0.1
 ThrusterUB:
   Name: ThrusterUB
   Address: 0x11
@@ -55,3 +60,4 @@ ThrusterUB:
   Scale: 2.65
   PositiveScale: 0.9
   NegativeScale: 1.45
+  Deadzone: 0.1
