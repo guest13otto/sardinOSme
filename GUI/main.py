@@ -4,6 +4,7 @@ from plot import Plot
 #from Gamepad import Gamepad
 from pubsub import pub
 import random
+import popup
 
 
 class GUI(Module):
@@ -19,11 +20,20 @@ class GUI(Module):
         self.profile = -1
         #pub.subscribe(self.test_handler, 'test.send')
         pub.subscribe(self.movement_handler, 'gamepad.movement')
-        pub.subscribe(self.profile_handler, 'gamepad.profile')
+        #pub.subscribe(self.profile_handler, 'gamepad.profile')
+
+        self.widgets = []
+        self.widgets.append((popup.ProfilePopup(), (0, 0)))
 
     def run(self):
         self.clock.tick(30)
         self.plot.update(self.movement, self.profile)
+
+        '''
+        for widget in self.widgets:
+            pygame.display.get_surface().blit(widget[0].update(), widget[1])
+        '''
+
         pygame.display.flip()
         for event in pygame.event.get():
             print(event)

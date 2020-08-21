@@ -7,7 +7,6 @@ class Label:
         self.y = y
         self.alignment = alignment
         self.colour = colour
-        self.size = size
         self.font = pygame.font.SysFont("Courier New", size)
 
     def set_text(self, text, screen):
