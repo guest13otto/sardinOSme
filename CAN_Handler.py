@@ -51,13 +51,14 @@ class CAN_Handler(Module):
             topic_name = "can.receive." + str(hex(message.arbitration_id))[2:]
             #print("topic_name: ", topic_name)
             pub.sendMessage(topic_name, message = message.data, extra = {"timestamp": message.timestamp})
-            
+
 
 class __Test_Case_Send__(Module):
     def run(self):
         pub.sendMessage('can.send', address = 0xff,data = bytearray([0x10]))
 
 if __name__ == "__main__":
+    #to test run script on pi, and a CANBUS node that receives 0x10 command
 
     def logger_sent(message):
         print("log.sent: ", message)

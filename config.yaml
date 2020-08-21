@@ -1,0 +1,44 @@
+Gamepad:
+  file: Gamepad
+  varclass: Gamepad
+  frequency: 240
+ProfileA:
+  file: ControlProfile
+  varclass: ControlProfile
+  frequency: 1
+  activate: 'A'
+  max_percentage: 100
+  formula_modifier: 30
+ProfileB:
+  file: ControlProfile
+  varclass: ControlProfile
+  frequency: 1
+  activate: 'B'
+  max_percentage: 70
+  formula_modifier: 50
+ProfileC:
+  file: ControlProfile
+  varclass: ControlProfile
+  frequency: 1
+  activate: 'C'
+  max_percentage: 50
+  formula_modifier: 50
+ProfileD:
+  file: ControlProfile
+  varclass: ControlProfile
+  frequency: 1
+  activate: 'D'
+  max_percentage: 30
+  formula_modifier: 50
+ThrusterPower:
+  file: Thruster_Power
+  varclass: Thruster_Power
+  frequency: 60
+Thrusters:
+  file: Thrusters
+  varclass: Thrusters
+  frequency: 60
+CAN_Handler:
+  file: CAN_Handler
+  varclass: CAN_Handler
+  frequency: 60
