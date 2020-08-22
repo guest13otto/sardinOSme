@@ -31,7 +31,7 @@ class Thrusters(Module):
         self.current_power = [0,0,0,0,0,0]
         self.output_power = [0,0,0,0,0,0]
         self.difference = [0,0,0,0,0,0]
-        self.target_power = [0,0,0,0,0,0]
+        self.target_power = [[0,0,0,0,0,0]]
         self.Thrusters = [self.ThrusterFL, self.ThrusterFR, self.ThrusterBL, self.ThrusterBR, self.ThrusterUF, self.ThrusterUB]
         #print(f"rate: {self.rate}")
 
@@ -40,14 +40,13 @@ class Thrusters(Module):
       return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
 
     def listener(self, message):
-        self.target_power = message
-        for list in self.target_power:
+        self.power = message
+        for list in self.power:
             for counter, power in enumerate(list):
                 if power > 0:
                     self.target_power[0][counter] = self.valmap(power, 0, 1, self.Thrusters[counter]["Deadzone"], 1)
                 elif power < 0:
                     self.target_power[0][counter] = self.valmap(power, 0, -1, -self.Thrusters[counter]["Deadzone"], -1)
-        print(self.target_power)
 
     def run(self):
         self.rate *= self.interval
@@ -99,8 +98,7 @@ class __Test_Case_Send__(Module):
         pub.subscribe(self.can_send_listener, "can.send")
 
     def can_send_listener(self, address, data):
-        pass
-        #print(f"address: {address}, data(binary): {data}, data(int): {data[1] << 8| data[2]}")
+        print(f"address: {address}, data(binary): {data}, data(int): {data[1] << 8| data[2]}")
 
     def run(self):
         pub.sendMessage("Thruster.Power", message = [[0.0001,0,0,0,0,0]])
