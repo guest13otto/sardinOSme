@@ -75,7 +75,7 @@ class Thrusters(Module):
         #print(f"current_power: {self.current_power}")
         print(f"output_power: {self.output_power}")
         #print(self.Thrusters[0]["Address"])
-        print(f"rate: {rate}")
+        #print(f"rate: {rate}")
 
 
 class __Test_Case_Send__(Module):

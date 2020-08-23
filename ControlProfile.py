@@ -49,10 +49,18 @@ class ControlProfile(Module):
             TiltFB = self.PowerFunction(TiltFB, self.formula_modifier)
             TiltLR = self.PowerFunction(TiltLR, self.formula_modifier)
 
+            Strafe *= self.max_percentage
+            Drive *= self.max_percentage
+            Yaw *= self.max_percentage
+            Updown *= self.max_percentage
+            TiltFB *= self.max_percentage
+            TiltLR *= self.max_percentage
+
             pub.sendMessage("command.movement", message = (Strafe, Drive, Yaw, Updown, TiltFB, TiltLR))
 
     def profileListener(self, message):
         self.profile_change = message
+        #print(self.profile_change)
 class __Test_Case_Send__(Module):
     def __init__(self):
         pub.subscribe(self.command_movement_listener, "command.movement")
@@ -71,6 +79,9 @@ if __name__ == "__main__":
     Gamepad.start(100)
 
     __test_case_send__ = __Test_Case_Send__()
-    __test_case_send__.start(1)
+    #__test_case_send__.start(1)
 
-    ControlProfile = ControlProfile(100, 0.0001, 'A')
+    ControlProfileA = ControlProfile(100, 0.0001, 'A')
+    ControlProfileB = ControlProfile(70, 0.0001, 'B')
+    ControlProfileC = ControlProfile(50, 0.0001, 'C')
+    ControlProfileD = ControlProfile(30, 0.0001, 'D')
