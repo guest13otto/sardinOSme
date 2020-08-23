@@ -82,10 +82,10 @@ if __name__ == "__main__":
     AsyncModuleManager = AsyncModuleManager()
 
     Gamepad = Gamepad()
-    #Gamepad.start(100)
+    Gamepad.start(100)
 
     __test_case_send__ = __Test_Case_Send__()
-    __test_case_send__.start(1)
+    #__test_case_send__.start(1)
 
     ControlProfileA = ControlProfile(100, 0.0001, 'A')
     ControlProfileB = ControlProfile(70, 0.0001, 'B')

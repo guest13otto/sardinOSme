@@ -1,7 +1,7 @@
 Gamepad:
   file: Gamepad
   varclass: Gamepad
-  frequency: 240
+  frequency: 500
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile
@@ -37,7 +37,7 @@ ThrusterPower:
 Thrusters:
   file: Thrusters
   varclass: Thrusters
-  frequency: 240
+  frequency: 500
 CAN_Handler:
   file: CAN_Handler
   varclass: CAN_Handler

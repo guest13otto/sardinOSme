@@ -21,7 +21,7 @@ gamepad.invert
 DeadZone_ThresholdL = 0.11
 DeadZone_ThresholdR = 0.1
 Normalize_Constant = 32768
-Normalize_Constant_Z = 256 #1024 Rasbian, 256 Windows
+Normalize_Constant_Z = 1024 #1024 Rasbian, 256 Windows
 Directional_BTN = {"BTN_NORTH", "BTN_WEST", "BTN_SOUTH", "BTN_EAST"}
 #BTN_TL, BTN_TR {0, 1}
 
@@ -113,6 +113,7 @@ class Gamepad(Module):
                 else:
                     self.movement_message = (-self.strafe, -self.drive, self.yaw,  self.updown, -self.tilt, 0)
                 #pub_to_manager('movement', message = self.movement_message)
+                #print("gamepad.movement" + self.movement_message)
                 pub.sendMessage("gamepad.movement", message = self.movement_message)
 
         hatcode = event.code[0:8]
@@ -146,7 +147,7 @@ if __name__ == "__main__":
     AsyncModuleManager = AsyncModuleManager()
 
     debug = Gamepad()
-    debug.start(10)
+    debug.start(240)
 
     AsyncModuleManager.register_modules(debug)
 

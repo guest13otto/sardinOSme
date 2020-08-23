@@ -185,15 +185,15 @@ if __name__ == "__main__":
     AsyncModuleManager = AsyncModuleManager()
 
     Gamepad = Gamepad()
-    #Gamepad.start(100)
+    Gamepad.start(240)
 
     ControlProfile = ControlProfile()
-    #ControlProfile.start(1)
+    ControlProfile.start(1)
 
     Thruster_Power = Thruster_Power()
     #__Test_Case_Combo__ = __Test_Case_Combo__()
     __Test_Case_Single__ = __Test_Case_Single__()
-    __Test_Case_Single__.start(1)
+    #__Test_Case_Single__.start(1)
     #__Test_Case_Combo__.start(1)
 
     AsyncModuleManager.register_modules(Gamepad, ControlProfile, Thruster_Power, __Test_Case_Single__)
