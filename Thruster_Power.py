@@ -120,8 +120,11 @@ class Thruster_Power(Module):
         finalList = self.pseudoInv(expectedResult)
         finalList = self.directionScale(finalList)
         finalList = self.invert(finalList)
-        #finalList = self.truncate(finalList)
+        finalList = self.truncate(finalList)
 
+        finalList = finalList.reshape(1,6)
+        finalList = finalList.tolist()
+        finalList = [item for item in finalList if isinstance(item,list)]
         pub.sendMessage("Thruster.Power", message = finalList)
 
     def run(self):
@@ -157,11 +160,11 @@ class __Test_Case_Single__(Module):
         pub.subscribe(self.Thruster_Power_Listener_Single, "Thruster.Power")
 
     def Thruster_Power_Listener_Single(self, message):
-        print(f"Scale Constants: {Scale_Constants}")
-        print("message: ", message.reshape(1,6))
+        #print(f"Scale Constants: {Scale_Constants}")
+        print("message: ", message)
 
     def run(self):
-        pub.sendMessage("command.movement", message = (0,0,0,0,0,1))
+        pub.sendMessage("command.movement", message = (0,0,0,0,0,0))
         self.stop()
 
 
@@ -169,9 +172,13 @@ if __name__ == "__main__":
     Print = False
     from itertools import combinations
     from Gamepad import Gamepad
+    from ControlProfile import ControlProfile
 
     Gamepad = Gamepad()
-    #Gamepad.start(1)
+    #Gamepad.start(100)
+
+    ControlProfile = ControlProfile()
+    #ControlProfile.start(1)
 
     Thruster_Power = Thruster_Power()
     #__Test_Case_Combo__ = __Test_Case_Combo__()
