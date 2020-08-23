@@ -16,7 +16,7 @@ import numpy as np
 import yaml
 
 #Scale constants
-Scale_Constants = [1,1,1,1,1,1]
+Scale_Constants = [1,1,1,1,1,1,1]
 Print = False
 
 
@@ -46,7 +46,7 @@ class Thruster_Power(Module):
             message = [0] * 6
             message[i] = -1
             self.gamepadScaleConstant(message)
-        #self.gamepadScaleConstant(message = [0,0,0,1,0,0])
+        self.gamepadScaleConstant(message = [0,0,0,1,0,0])##
 
         pub.subscribe(self.command_movement, "command.movement")
 
@@ -62,7 +62,7 @@ class Thruster_Power(Module):
                 finalList[counter, 0] *= Thruster["NegativeScale"]
             else:
                 finalList[counter, 0] *= Thruster["PositiveScale"]
-            #finalList[counter,0] /= Thruster["Scale"] # uncomment for cmbinational movement
+            #finalList[counter,0] /= Thruster["Scale"] # uncomment for combinational movement
             if Thruster["Invert"] == True:
                 finalList[counter, 0] *= -1
         if Print:
@@ -92,7 +92,10 @@ class Thruster_Power(Module):
         gamepadScaled = list(message)
         for counter, dof in enumerate(gamepadScaled):
             #if counter != 5:
-            gamepadScaled[counter] *= Scale_Constants[counter]
+            if counter == 3 and dof > 0:
+                gamepadScaled[counter] *= Scale_Constants[6]
+            else:
+                gamepadScaled[counter] *= Scale_Constants[counter]
         if Print:
             print('gamepadScaled out :', gamepadScaled)
         return gamepadScaled
@@ -107,8 +110,9 @@ class Thruster_Power(Module):
         finalList = self.directionScale(finalList)
         for counter, dof in enumerate(message):
             if dof != 0 and max(abs(finalList)) != 0:
-                Scale_Constants[counter] = float(1/max(abs(finalList)))
-        #print(Scale_Constants)
+                Scale_Constants[self.counter] = float(1/max(abs(finalList)))
+        self.counter += 1
+        print(Scale_Constants)
 
     def command_movement(self, message):
         if Print:
@@ -164,7 +168,7 @@ class __Test_Case_Single__(Module):
         print("message: ", message)
 
     def run(self):
-        pub.sendMessage("command.movement", message = (0,0,0,0,0,0))
+        pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
         self.stop()
 
 
