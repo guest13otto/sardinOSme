@@ -19,7 +19,7 @@ import yaml
 import numpy as np
 
 class Thrusters(Module):
-    def __init__(self):
+    def __init__ (self):
         try:
             content = yaml.load(open('Thruster.yaml', 'r'), Loader = yaml.FullLoader)
             for key,value in content.items():
@@ -33,7 +33,7 @@ class Thrusters(Module):
         self.difference = [0,0,0,0,0,0]
         self.target_power = [[0,0,0,0,0,0]]
         self.Thrusters = [self.ThrusterFL, self.ThrusterFR, self.ThrusterBL, self.ThrusterBR, self.ThrusterUF, self.ThrusterUB]
-        #print(f"rate: {self.rate}")
+
 
     @staticmethod
     def valmap(value, istart, istop, ostart, ostop):
@@ -47,15 +47,17 @@ class Thrusters(Module):
                     self.target_power[0][counter] = self.valmap(power, 0, 1, self.Thrusters[counter]["Deadzone"], 1)
                 elif power < 0:
                     self.target_power[0][counter] = self.valmap(power, 0, -1, -self.Thrusters[counter]["Deadzone"], -1)
+                else:
+                    self.target_power[0][counter] = 0
+            #print(self.target_power)
 
     def run(self):
-        self.rate *= self.interval
-        #self.rate *= self.interval
+        rate = self.rate * self.interval
         for list in self.target_power:
             for counter, power in enumerate(list):
                 self.difference[counter] = power - self.current_power[counter]
-                if abs(self.difference[counter]) > self.rate:
-                    self.current_power[counter] += self.difference[counter]/abs(self.difference[counter])*self.rate
+                if abs(self.difference[counter]) > rate:
+                    self.current_power[counter] += self.difference[counter]/abs(self.difference[counter])*rate
                 else:
                     self.current_power[counter] = power
                 if abs(self.current_power[counter]) > 1:
@@ -69,28 +71,11 @@ class Thrusters(Module):
                     self.output_power[counter] = int(self.output_power[counter]*32768)
 
                 pub.sendMessage("can.send", address = self.Thrusters[counter]["Address"], data = [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff])
-
-        '''for counter, target_power in enumerate(self.target_power):
-            self.difference[counter] = target_power - self.current_power[counter]
-            if abs(self.difference[counter]) > self.rate:
-                self.current_power[counter] += self.difference[counter]/abs(self.difference[counter])*self.rate
-            else:
-                self.current_power[counter] = target_power
-            if abs(self.current_power[counter]) > 1:
-                self.output_power[counter] = self.current_power/abs(self.current_power[counter])
-            else:
-                self.output_power[counter] = self.current_power[counter]
-
-            if self.output_power[counter] >= 0:
-                self.output_power[counter] = int(self.output_power[counter]*32767)
-            else:
-                self.output_power[counter] = int(self.output_power[counter]*32768)
-
-            pub.sendMessage("can.send", address = self.Thrusters[counter]["Address"], data = [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff])'''
         #print(f"difference: {self.difference}")
         #print(f"current_power: {self.current_power}")
-        #print(f"output_power: {self.output_power}")
+        print(f"output_power: {self.output_power}")
         #print(self.Thrusters[0]["Address"])
+        print(f"rate: {rate}")
 
 
 class __Test_Case_Send__(Module):

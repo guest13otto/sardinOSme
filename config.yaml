@@ -37,8 +37,8 @@ ThrusterPower:
 Thrusters:
   file: Thrusters
   varclass: Thrusters
-  frequency: 10
+  frequency: 240
 #CAN_Handler:
 #  file: CAN_Handler
 #  varclass: CAN_Handler
-#  frequency: 100
+#  frequency: 1
