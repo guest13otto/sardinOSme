@@ -21,7 +21,7 @@ gamepad.invert
 DeadZone_ThresholdL = 0.11
 DeadZone_ThresholdR = 0.1
 Normalize_Constant = 32768
-Normalize_Constant_Z = 256 #1024 white controller ; 256 black controller
+Normalize_Constant_Z = 1024 #1024 white controller ; 256 black controller
 Directional_BTN = {"BTN_NORTH", "BTN_WEST", "BTN_SOUTH", "BTN_EAST"}
 #BTN_TL, BTN_TR {0, 1}
 
