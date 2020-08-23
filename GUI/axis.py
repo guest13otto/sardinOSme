@@ -6,7 +6,7 @@ class Axis(pygame.sprite.Sprite):
         super().__init__()
         self.screen = screen
         self.xlim = screen_width - xliftoff * 2
-        self.ylim = bar_width * (9*2+1)
+        self.ylim = bar_width * (11*2+1)
         self.xliftoff = xliftoff
         self.yliftoff = yliftoff
         self.screen_width = screen_width
@@ -27,11 +27,11 @@ class Axis(pygame.sprite.Sprite):
             x = self.xliftoff+xDiv*(i+1)
             pygame.draw.line(self.screen, magenta, (x, y-5), (x, y+5), axis_width)
             if i == 0:
-                display_text('-1', self.screen, x, y+15, 'center', 'black')
+                display_text('-1', self.screen, x, y+15, 'center', 'b', 14)
             elif i == 10:
-                display_text('0', self.screen, x, y+15, 'center', 'black')
+                display_text('0', self.screen, x, y+15, 'center', 'b', 14)
             elif i == 20:
-                display_text('1', self.screen, x, y+15, 'center', 'black')
+                display_text('1', self.screen, x, y+15, 'center', 'b', 14)
 
         # draw y axis
         yStart = (self.screen_width/2, self.screen_height-self.yliftoff-self.ylim)
@@ -39,11 +39,11 @@ class Axis(pygame.sprite.Sprite):
         pygame.draw.line(self.screen, magenta, yStart, yEnd, axis_width)
 
 
-def display_text(text, screen, x, y, alignment, colour):
+def display_text(text, screen, x, y, alignment, colour, size):
     black = (0, 0, 0)
-    if colour == 'black':
+    if colour == 'b':
         colour = black
-    font = pygame.font.SysFont("Courier New", 14)
+    font = pygame.font.SysFont("Courier New", size)
     textSurf = font.render(text, True, colour)
     textRect = textSurf.get_rect()
     if alignment == 'left':
