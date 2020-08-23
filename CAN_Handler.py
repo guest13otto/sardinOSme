@@ -25,11 +25,13 @@ can.receive.<arbitration_id>:
 '''
 
 import can
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 from pubsub import pub
 
 class CAN_Handler(Module):
     def __init__(self):
+        super().__init__()
         self.bus = can.interface.Bus(bustype = "socketcan", channel = "can0", bitrate = 250000)
         pub.subscribe(self.message_listener, "can.send")
         #notifier = can.Notifier(self.bus, [CAN_Listener])
@@ -54,8 +56,11 @@ class CAN_Handler(Module):
 
 
 class __Test_Case_Send__(Module):
+    def __init__(self):
+        super().__init__()
     def run(self):
         pub.sendMessage('can.send', address = 0xff,data = bytearray([0x10]))
+        self.stop_all
 
 if __name__ == "__main__":
     #to test run script on pi, and a CANBUS node that receives 0x10 command
@@ -69,12 +74,23 @@ if __name__ == "__main__":
     def logger_receive(message, extra):
         print("can.receive: ", message, "can.extra: ", extra)
 
-    can_handler = CAN_Handler()
-    can_handler.start(1)
-
-    test_case_send = __Test_Case_Send__()
-    test_case_send.start(1)
-
     pub.subscribe(logger_sent, "log.sent")
     pub.subscribe(logger_error, "log.error")
     pub.subscribe(logger_receive, "can.receive")
+
+    can_handler = CAN_Handler()
+    can_handler.start(1)
+    test_case_send = __Test_Case_Send__()
+    test_case_send.start(1)
+    AsyncModuleManager = AsyncModuleManager()
+    AsyncModuleManager.register_modules(can_handler, test_case_send)
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()

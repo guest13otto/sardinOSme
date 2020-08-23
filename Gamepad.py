@@ -21,7 +21,7 @@ gamepad.invert
 DeadZone_ThresholdL = 0.11
 DeadZone_ThresholdR = 0.1
 Normalize_Constant = 32768
-Normalize_Constant_Z = 1024 #1024 white controller ; 256 black controller
+Normalize_Constant_Z = 256 #1024 Rasbian, 256 Windows
 Directional_BTN = {"BTN_NORTH", "BTN_WEST", "BTN_SOUTH", "BTN_EAST"}
 #BTN_TL, BTN_TR {0, 1}
 
@@ -33,7 +33,8 @@ ProfileDict = {'BTN_THUMB0': 'A',
 # variables
 from inputs import get_gamepad
 from pubsub import pub
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 
 
 def normalize(X, constant = Normalize_Constant):
@@ -65,6 +66,7 @@ def half_movement_value_split(full_value):
 
 class Gamepad(Module):
     def __init__(self):
+        super().__init__()
         #pub.subscribe(self.south_listener, 'transectline')
         self.drive = 0
         self.strafe = 0
@@ -140,14 +142,28 @@ class Gamepad(Module):
 
 if __name__ == "__main__":
     import time
+
+    AsyncModuleManager = AsyncModuleManager()
+
+    debug = Gamepad()
+    debug.start(10)
+
+    AsyncModuleManager.register_modules(debug)
+
     def debug_listener_movement(message):
         print("movement", message)
 
     def debug_listener_profile(message):
         print("\t\t\t\t\t", "profile", message,"\n")
-        time.sleep(1)
-
-    debug = Gamepad()
-    debug.start(120)
     pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()

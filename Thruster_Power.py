@@ -10,7 +10,8 @@ Thruster.Power
     messsage: FL, FR, BL, BR, UF, UB <-1, 1>
 '''
 
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 from pubsub import pub
 import numpy as np
 import yaml
@@ -22,6 +23,7 @@ Print = False
 
 class Thruster_Power(Module):
     def __init__ (self):
+        super().__init__()
         try:
             content = yaml.load(open('Thruster.yaml', 'r'), Loader = yaml.FullLoader)
             for key,value in content.items():
@@ -46,7 +48,7 @@ class Thruster_Power(Module):
             message = [0] * 6
             message[i] = -1
             self.gamepadScaleConstant(message)
-        self.gamepadScaleConstant(message = [0,0,0,1,0,0])##
+        self.gamepadScaleConstant(message = [0,0,0,1,0,0])
 
         pub.subscribe(self.command_movement, "command.movement")
 
@@ -112,7 +114,7 @@ class Thruster_Power(Module):
             if dof != 0 and max(abs(finalList)) != 0:
                 Scale_Constants[self.counter] = float(1/max(abs(finalList)))
         self.counter += 1
-        print(Scale_Constants)
+        #print(Scale_Constants)
 
     def command_movement(self, message):
         if Print:
@@ -136,6 +138,7 @@ class Thruster_Power(Module):
 
 class __Test_Case_Combo__(Module):
     def __init__(self):
+        super().__init__()
         pub.subscribe(self.Thruster_Power_Listener_Max, "Thruster.Power")
         self.List = [(-1,0,1),(-1,0,1),(-1,0,1),(-1,0,1),(-1,0,1)]
         self.FL_List, self.FR_List, self.BL_List, self.BR_List, self.UF_List, self.UB_List = [],[],[],[],[],[]
@@ -157,10 +160,11 @@ class __Test_Case_Combo__(Module):
             or combo[2] + combo[4] == 1 or (combo[2] == 0 and combo[4] == 0)):'''
             self.message = (combo[0], combo[1], combo[2], combo[3], combo[4], 0)
             pub.sendMessage("command.movement", message = self.message)
-        self.stop()
+        self.stop_all()
 
 class __Test_Case_Single__(Module):
     def __init__(self):
+        super().__init__()
         pub.subscribe(self.Thruster_Power_Listener_Single, "Thruster.Power")
 
     def Thruster_Power_Listener_Single(self, message):
@@ -169,7 +173,7 @@ class __Test_Case_Single__(Module):
 
     def run(self):
         pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
-        self.stop()
+        self.stop_all()
 
 
 if __name__ == "__main__":
@@ -177,6 +181,8 @@ if __name__ == "__main__":
     from itertools import combinations
     from Gamepad import Gamepad
     from ControlProfile import ControlProfile
+
+    AsyncModuleManager = AsyncModuleManager()
 
     Gamepad = Gamepad()
     #Gamepad.start(100)
@@ -189,3 +195,15 @@ if __name__ == "__main__":
     __Test_Case_Single__ = __Test_Case_Single__()
     __Test_Case_Single__.start(1)
     #__Test_Case_Combo__.start(1)
+
+    AsyncModuleManager.register_modules(Gamepad, ControlProfile, Thruster_Power, __Test_Case_Single__)
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()
