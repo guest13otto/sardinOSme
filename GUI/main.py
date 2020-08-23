@@ -12,9 +12,9 @@ class GUI(Module):
         super().__init__()
         pygame.init()
         pygame.display.set_caption("ControlGUI(UWU")
-        screen = pygame.display.set_mode((400, 300))
+        self.screen = pygame.display.set_mode((400, 300))
         self.clock = pygame.time.Clock()
-        self.plot = Plot(screen, 400, 300)
+        self.plot = Plot(self.screen, 400, 300)
         self.movement = [0 for i in range(11)]
         self.thruster = [0 for i in range(6)]
         self.profile = -1
@@ -27,12 +27,11 @@ class GUI(Module):
 
     def run(self):
         self.clock.tick(30)
+
         self.plot.update(self.movement, self.profile)
 
-        '''
         for widget in self.widgets:
             pygame.display.get_surface().blit(widget[0].update(), widget[1])
-        '''
 
         pygame.display.flip()
         for event in pygame.event.get():
@@ -67,7 +66,7 @@ class TestCaseSend(Module):
 
     @Module.loop(0.25)
     def run2(self):
-        self.profile = random.randint(0, 4)
+        self.profile = random.randint(0, 3)
         pub.sendMessage('gamepad.profile', message=self.profile)
         print(self.profile)
 

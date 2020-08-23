@@ -22,16 +22,21 @@ class ProfilePopup:
         self.set_profile(message)
 
     def set_profile(self, profile):
-        self.expired = time.time() + 2
+        if profile != self.profile:
+            self.expired = time.time() + 2
         self.profile = profile
 
     def update(self):
         if self.expired > time.time():
             self.surface.fill(self.colours[self.profile])
+            self.surface.set_alpha(255)
+            '''
             textSurf = self.font.render(self.labels[self.profile], True, self.colours[self.profile])
             textRect = textSurf.get_rect()
             textRect.center = (200, 150)
             self.surface.blit(textSurf, (0, 0))
+            '''
         else:
-            self.surface.fill((0, 0, 0, 0))
+            self.surface.fill((0, 0, 0))
+            self.surface.set_alpha(0)
         return self.surface #, textSurf, textRect
