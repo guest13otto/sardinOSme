@@ -18,10 +18,12 @@ command.movement
 
 
 from pubsub import pub
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 
 class ControlProfile(Module):
     def __init__(self, max_percentage = 100, formula_modifier = 30, activate = 'A'):
+        super().__init__()
         pub.subscribe(self.movementListener, 'gamepad.movement')
         pub.subscribe(self.profileListener, 'gamepad.profile')
         self.max_percentage = int(max_percentage)/100
@@ -63,25 +65,41 @@ class ControlProfile(Module):
         #print(self.profile_change)
 class __Test_Case_Send__(Module):
     def __init__(self):
+        super().__init__()
         pub.subscribe(self.command_movement_listener, "command.movement")
 
     def command_movement_listener(self, message):
         print(f"message: ", message)
 
     def run(self):
-        pass
-        #pub.sendMessage("gamepad.movement", message = (0.2,0,0,0,0,0))
-        #pub.sendMessage("gamepad.profile", message = 'A')
+        pub.sendMessage("gamepad.movement", message = (0.2,0,0,0,0,0))
+        pub.sendMessage("gamepad.profile", message = 'A')
+        self.stop_all()
 
 if __name__ == "__main__":
     from Gamepad import Gamepad
+
+    AsyncModuleManager = AsyncModuleManager()
+
     Gamepad = Gamepad()
-    Gamepad.start(100)
+    #Gamepad.start(100)
 
     __test_case_send__ = __Test_Case_Send__()
-    #__test_case_send__.start(1)
+    __test_case_send__.start(1)
 
     ControlProfileA = ControlProfile(100, 0.0001, 'A')
     ControlProfileB = ControlProfile(70, 0.0001, 'B')
     ControlProfileC = ControlProfile(50, 0.0001, 'C')
     ControlProfileD = ControlProfile(30, 0.0001, 'D')
+
+    AsyncModuleManager.register_modules(Gamepad, __test_case_send__, ControlProfileA, ControlProfileB, ControlProfileC, ControlProfileD)
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()

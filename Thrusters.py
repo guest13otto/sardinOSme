@@ -13,13 +13,15 @@ can.send
 '''
 
 
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 from pubsub import pub
 import yaml
 import numpy as np
 
 class Thrusters(Module):
     def __init__ (self):
+        super().__init__()
         try:
             content = yaml.load(open('Thruster.yaml', 'r'), Loader = yaml.FullLoader)
             for key,value in content.items():
@@ -51,7 +53,8 @@ class Thrusters(Module):
                     self.target_power[0][counter] = 0
             #print(self.target_power)
 
-    def run(self):
+    @Module.loop(1)
+    def run_rate(self):
         rate = self.rate * self.interval
         for list in self.target_power:
             for counter, power in enumerate(list):
@@ -80,6 +83,7 @@ class Thrusters(Module):
 
 class __Test_Case_Send__(Module):
     def __init__(self):
+        super().__init__()
         pub.subscribe(self.can_send_listener, "can.send")
 
     def can_send_listener(self, address, data):
@@ -87,7 +91,7 @@ class __Test_Case_Send__(Module):
 
     def run(self):
         pub.sendMessage("Thruster.Power", message = [[0.0001,0,0,0,0,0]])
-        self.stop()
+        self.stop_all()
 
 if __name__ == "__main__":
     from Gamepad import Gamepad
@@ -97,5 +101,17 @@ if __name__ == "__main__":
     Thrusters = Thrusters()
     Thrusters.start(1)
 
-    __test_case_send = __Test_Case_Send__()
-    __test_case_send.start(1)
+    __test_case_send__ = __Test_Case_Send__()
+    __test_case_send__.start(1)
+    AsyncModuleManager = AsyncModuleManager()
+    AsyncModuleManager.register_modules(__test_case_send__, Thrusters)
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()
