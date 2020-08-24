@@ -47,8 +47,8 @@ class Thruster_Power(Module):
         for i in range(6):
             message = [0] * 6
             message[i] = -1
-            self.gamepadScaleConstant(message)
-        self.gamepadScaleConstant(message = [0,0,0,1,0,0])
+            self.gamepadScaleConstant(message = {"command_message": message})
+        self.gamepadScaleConstant(message = {"command_message": [0,0,0,1,0,0]})
 
         pub.subscribe(self.command_movement, "command.movement")
 
@@ -91,7 +91,7 @@ class Thruster_Power(Module):
         return finalList
 
     def gamepadScale(self, message):
-        gamepadScaled = list(message)
+        gamepadScaled = list(message["command_message"])
         for counter, dof in enumerate(gamepadScaled):
             #if counter != 5:
             if counter == 3 and dof > 0:
@@ -106,7 +106,7 @@ class Thruster_Power(Module):
         #print(message)
         if Print:
             print("Test case: ", message)
-        Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message
+        Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message["command_message"]
         expectedResult = np.array((Strafe, Drive, Updown, TiltFB, TiltLR, Yaw)).reshape(6,1)
         finalList = self.pseudoInv(expectedResult)
         finalList = self.directionScale(finalList)
@@ -131,7 +131,7 @@ class Thruster_Power(Module):
         finalList = finalList.reshape(1,6)
         finalList = finalList.tolist()
         finalList = [item for item in finalList if isinstance(item,list)]
-        pub.sendMessage("Thruster.Power", message = finalList)
+        pub.sendMessage("Thruster.Power", message = {"Thruster_message": finalList})
 
     def run(self):
         pass
@@ -144,7 +144,7 @@ class __Test_Case_Combo__(Module):
         self.FL_List, self.FR_List, self.BL_List, self.BR_List, self.UF_List, self.UB_List = [],[],[],[],[],[]
 
     def Thruster_Power_Listener_Max(self, message):
-        FL, FR, BL, BR, UF, UB = message
+        FL, FR, BL, BR, UF, UB = message["Thruster_message"]
         self.FL_List.append(FL), self.FR_List.append(FR), self.BL_List.append(BL), self.BR_List.append(BR), self.UF_List.append(UF), self.UB_List.append(UB)
         print(f"max FL: {float(max(np.abs(self.FL_List)))}, combo: {self.message}, item: {len(self.FL_List)}")
         print(f"max FR: {float(max(np.abs(self.FR_List)))}")
@@ -159,7 +159,7 @@ class __Test_Case_Combo__(Module):
             '''if (combo[0] + combo[1] == 1  or combo[0] + combo[1] == -1 or (combo[0] == 0 and combo[1] == 0)) and (combo[2] + combo[4] == -1 \
             or combo[2] + combo[4] == 1 or (combo[2] == 0 and combo[4] == 0)):'''
             self.message = (combo[0], combo[1], combo[2], combo[3], combo[4], 0)
-            pub.sendMessage("command.movement", message = self.message)
+            pub.sendMessage("command.movement", message = {"command_message": self.message})
         self.stop_all()
 
 class __Test_Case_Single__(Module):
@@ -169,34 +169,34 @@ class __Test_Case_Single__(Module):
 
     def Thruster_Power_Listener_Single(self, message):
         #print(f"Scale Constants: {Scale_Constants}")
-        print("message: ", message)
+        print("message: ", message["Thruster_message"])
+        #print("time: ", time.time())
 
     def run(self):
-        pub.sendMessage("command.movement", message = (0,0,0,1,0,0))
-        self.stop_all()
+        initial = time.time()
+        #print("initial: ", initial)
+        pub.sendMessage("command.movement", message = {"command_message": (0,1,0,1,0,0)})
 
 
 if __name__ == "__main__":
-    Print = False
+    import time
     from itertools import combinations
     from Gamepad import Gamepad
     from ControlProfile import ControlProfile
 
     AsyncModuleManager = AsyncModuleManager()
-
     Gamepad = Gamepad()
     Gamepad.start(240)
-
     ControlProfile = ControlProfile()
     ControlProfile.start(1)
 
     Thruster_Power = Thruster_Power()
     #__Test_Case_Combo__ = __Test_Case_Combo__()
     __Test_Case_Single__ = __Test_Case_Single__()
-    #__Test_Case_Single__.start(1)
+    #__Test_Case_Single__.start(10)
     #__Test_Case_Combo__.start(1)
 
-    AsyncModuleManager.register_modules(Gamepad, ControlProfile, Thruster_Power, __Test_Case_Single__)
+    AsyncModuleManager.register_modules(Thruster_Power, __Test_Case_Single__)
 
     try:
         AsyncModuleManager.run_forever()

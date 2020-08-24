@@ -43,7 +43,7 @@ class ControlProfile(Module):
 
     def movementListener(self, message):
         if self.profile_change == self.activate:
-            Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message
+            Strafe, Drive, Yaw, Updown, TiltFB, TiltLR = message["gamepad_message"]
             Strafe = self.PowerFunction(Strafe, self.formula_modifier)
             Drive = self.PowerFunction(Drive, self.formula_modifier)
             Yaw = self.PowerFunction(Yaw, self.formula_modifier)
@@ -58,10 +58,10 @@ class ControlProfile(Module):
             TiltFB *= self.max_percentage
             TiltLR *= self.max_percentage
 
-            pub.sendMessage("command.movement", message = (Strafe, Drive, Yaw, Updown, TiltFB, TiltLR))
+            pub.sendMessage("command.movement", message = {"command_message": (Strafe, Drive, Yaw, Updown, TiltFB, TiltLR)})
 
     def profileListener(self, message):
-        self.profile_change = message
+        self.profile_change = message["Profile_Dict"]
         #print(self.profile_change)
 class __Test_Case_Send__(Module):
     def __init__(self):
@@ -69,11 +69,11 @@ class __Test_Case_Send__(Module):
         pub.subscribe(self.command_movement_listener, "command.movement")
 
     def command_movement_listener(self, message):
-        print(f"message: ", message)
+        print(message["command_message"])
 
     def run(self):
-        pub.sendMessage("gamepad.movement", message = (0.2,0,0,0,0,0))
-        pub.sendMessage("gamepad.profile", message = 'A')
+        pub.sendMessage("gamepad.movement", message = {"gamepad_message": (0.2,0,0,0,0,0)})
+        pub.sendMessage("gamepad.profile", message = {"Profile_Dict": 'A'})
         self.stop_all()
 
 if __name__ == "__main__":
@@ -92,7 +92,7 @@ if __name__ == "__main__":
     ControlProfileC = ControlProfile(50, 0.0001, 'C')
     ControlProfileD = ControlProfile(30, 0.0001, 'D')
 
-    AsyncModuleManager.register_modules(Gamepad, __test_case_send__, ControlProfileA, ControlProfileB, ControlProfileC, ControlProfileD)
+    AsyncModuleManager.register_modules(__test_case_send__, ControlProfileA, ControlProfileB, ControlProfileC, ControlProfileD)
 
     try:
         AsyncModuleManager.run_forever()

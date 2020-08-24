@@ -42,7 +42,7 @@ class Thrusters(Module):
       return ostart + (ostop - ostart) * ((value - istart) / (istop - istart))
 
     def listener(self, message):
-        self.power = message
+        self.power = message["Thruster_message"]
         for list in self.power:
             for counter, power in enumerate(list):
                 if power > 0:
@@ -72,10 +72,10 @@ class Thrusters(Module):
                 else:
                     self.output_power[counter] = int(self.output_power[counter]*32768)
 
-                pub.sendMessage("can.send", address = self.Thrusters[counter]["Address"], data = [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff])
+                pub.sendMessage("can.send", message = {"address": self.Thrusters[counter]["Address"], "data": [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff]})
         #print(f"difference: {self.difference}")
         #print(f"current_power: {self.current_power}")
-        print(f"output_power: {self.output_power}")
+        #print(f"output_power: {self.output_power}")
         #print(self.Thrusters[0]["Address"])
         #print(f"rate: {rate}")
 
@@ -85,11 +85,11 @@ class __Test_Case_Send__(Module):
         super().__init__()
         pub.subscribe(self.can_send_listener, "can.send")
 
-    def can_send_listener(self, address, data):
-        print(f"address: {address}, data(binary): {data}, data(int): {data[1] << 8| data[2]}")
+    def can_send_listener(self, message):
+        print('address:' ,message["address"], 'data(binary):', message["data"], 'data(int):', message["data"][1] << 8| message["data"][2])
 
     def run(self):
-        pub.sendMessage("Thruster.Power", message = [[0.0001,0,0,0,0,0]])
+        pub.sendMessage("Thruster.Power", message = {"Thruster_message": [[0.0001,0,0,0,0,0]]})
         self.stop_all()
 
 if __name__ == "__main__":

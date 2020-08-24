@@ -33,8 +33,7 @@ ProfileDict = {'BTN_THUMB0': 'A',
 # variables
 from inputs import get_gamepad
 from pubsub import pub
-import threading
-from Module_Base_Async import Module
+from Module_Base import Module
 
 
 def normalize(X, constant = Normalize_Constant):
@@ -83,99 +82,70 @@ class Gamepad(Module):
         self.thumb_profile_cycle = 0
         super().__init__()
 
-    def run_start_gamepad_thread(self):
-        self.gamepad_thread_is_active = True
-        self.gamepad_loop = threading.Thread(target = self.gamepad_event)
-        self.gamepad_loop.start()
+    def run(self):
+        events= get_gamepad()
+        analogcode = None
+        for event in events:
+            if self.active:
+                analogcode = event.code[0:6]
+                if (analogcode == "ABS_X"):
+                    self.strafe = deadzoneleft(normalize(event.state))
+                elif (analogcode == "ABS_Y"):
+                    self.drive = deadzoneleft(normalize(event.state))
+                elif (analogcode == "ABS_RX"):
+                    self.yaw = deadzoneright(normalize(event.state))
+                elif (analogcode == "ABS_RY"):
+                    self.tilt = (deadzoneright(normalize(event.state)))
+                    #print(self.tilt)
+                if (analogcode == "ABS_Z"):
+                    self.updown1 =  (-1)*normalize(event.state, Normalize_Constant_Z)
+                if (analogcode == "ABS_RZ"):
+                    self.updown2 = normalize(event.state, Normalize_Constant_Z)
 
-    def gamepad_event(self):
-        #global previous_message
-        #global movement_message
-        while self.gamepad_thread_is_active:
-            events= get_gamepad()
-            analogcode = None
-            for event in events:
-                if self.active:
-                    analogcode = event.code[0:6]
-                    if (analogcode == "ABS_X"):
-                        self.strafe = deadzoneleft(normalize(event.state))
-                    elif (analogcode == "ABS_Y"):
-                        self.drive = deadzoneleft(normalize(event.state))
-                    elif (analogcode == "ABS_RX"):
-                        self.yaw = deadzoneright(normalize(event.state))
-                    elif (analogcode == "ABS_RY"):
-                        self.tilt = (deadzoneright(normalize(event.state)))
-                        #print(self.tilt)
-                    if (analogcode == "ABS_Z"):
-                        self.updown1 =  (-1)*normalize(event.state, Normalize_Constant_Z)
-                    if (analogcode == "ABS_RZ"):
-                        self.updown2 = normalize(event.state, Normalize_Constant_Z)
-
-                    self.updown = half_movement_value_join(self.updown1, self.updown2)
+                self.updown = half_movement_value_join(self.updown1, self.updown2)
 
 
-                    if self.control_invert == False:#tfront, tback
-                        self.movement_message = (self.strafe, self.drive, self.yaw, self.updown, self.tilt, 0)
-                    else:
-                        self.movement_message = (-self.strafe, -self.drive, self.yaw,  self.updown, -self.tilt, 0)
-                    #pub_to_manager('movement', message = self.movement_message)
-                    pub.sendMessage("gamepad.movement", message = self.movement_message)
-
-            hatcode = event.code[0:8]
-            controlcode = event.code
-            if controlcode[:9] == "BTN_THUMB" and event.state!=0:
-                if controlcode[-1] == "R":
-                    self.thumb_profile_cycle = (self.thumb_profile_cycle+1)%4
+                if self.control_invert == False:#tfront, tback
+                    self.movement_message = (self.strafe, self.drive, self.yaw, self.updown, self.tilt, 0)
                 else:
-                    self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%4
-                pub.sendMessage("gamepad.profile", message = ProfileDict[str(event.code[:-1])+str(self.thumb_profile_cycle)])
+                    self.movement_message = (-self.strafe, -self.drive, self.yaw,  self.updown, -self.tilt, 0)
+                #pub_to_manager('movement', message = self.movement_message)
+                pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message})
 
-            if controlcode == 'BTN_TL' and event.state != 0:
-                pass #EM
+                hatcode = event.code[0:8]
+                controlcode = event.code
+                if controlcode[:9] == "BTN_THUMB" and event.state!=0:
+                    if controlcode[-1] == "R":
+                        self.thumb_profile_cycle = (self.thumb_profile_cycle+1)%4
+                    else:
+                        self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%4
+                    pub.sendMessage("gamepad.profile", message = {"Profile_Dict": ProfileDict[str(event.code[:-1])+str(self.thumb_profile_cycle)]})
 
-            if controlcode == 'BTN_TR' and event.state != 0:
-                pass #EM
+                if controlcode == 'BTN_TL' and event.state != 0:
+                    pass #EM
 
-            if (controlcode == "BTN_SOUTH") and (event.state == 1):
-                pass
-                pub.sendMessage("movement_activation", sender = "transectline")
-                pub.sendMessage("show_transectline", message = not self.show_transectline)
+                if controlcode == 'BTN_TR' and event.state != 0:
+                    pass #EM
 
-            if (controlcode == "BTN_WEST") and (event.state == 1):
-                self.control_invert = not self.control_invert
-                pub.sendMessage("gamepad.invert", message = self.control_invert) #For GUI
+                if (controlcode == "BTN_SOUTH") and (event.state == 1):
+                    pass
+                    pub.sendMessage("gamepad.movement_activation", message = {"activate": "transectline"})
+                    pub.sendMessage("gamepad.show_transectline", message = {"show": not self.show_transectline})
 
-        time.sleep(0.00001)
-
-    def destroy(self):
-        print("Destroyed")
-        self.gamepad_thread_is_active = False
-
+                if (controlcode == "BTN_WEST") and (event.state == 1):
+                    self.control_invert = not self.control_invert
+                    pub.sendMessage("gamepad.invert", message = {"invert": self.control_invert}) #For GUI
 
 if __name__ == "__main__":
     import time
-    from Module_Base_Async import AsyncModuleManager
     def debug_listener_movement(message):
-        print("movement", message)
+        print(message["gamepad_message"])
 
     def debug_listener_profile(message):
-        print("\t\t\t\t\t", "profile", message,"\n")
-        time.sleep(1)
+        print("\t\t\t\t\t", message["Profile_Dict"])
+        #time.sleep(1)
 
     debug = Gamepad()
-    debug.start(1)
+    debug.start(100)
     pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
-    AsyncModuleManager.register_module(debug)
-
-    try:
-        AsyncModuleManager.run_forever()
-    except KeyboardInterrupt:
-        pass
-    except BaseException:
-        pass
-    finally:
-        print("Closing Loop")
-        AsyncModuleManager.stop_all()
-
-

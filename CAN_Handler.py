@@ -25,8 +25,7 @@ can.receive.<arbitration_id>:
 '''
 
 import can
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Module
 from pubsub import pub
 
 class CAN_Handler(Module):
@@ -36,8 +35,8 @@ class CAN_Handler(Module):
         pub.subscribe(self.message_listener, "can.send")
         #notifier = can.Notifier(self.bus, [CAN_Listener])
 
-    def message_listener(self, address, data):
-        msg = can.Message(arbitration_id = address, data = data, is_extended_id = False)
+    def message_listener(self, message):
+        msg = can.Message(arbitration_id = message["address"], data = message["data"], is_extended_id = False)
         try:
             self.bus.send(msg)
             pub.sendMessage("log.sent" , message = msg)
@@ -52,15 +51,15 @@ class CAN_Handler(Module):
         if message != None:
             topic_name = "can.receive." + str(hex(message.arbitration_id))[2:]
             #print("topic_name: ", topic_name)
-            pub.sendMessage(topic_name, message = message.data, extra = {"timestamp": message.timestamp})
+            pub.sendMessage(topic_name, message  = {"data": message.data, "extra": {"timestamp": message.timestamp}})
 
 
 class __Test_Case_Send__(Module):
     def __init__(self):
         super().__init__()
     def run(self):
-        pub.sendMessage('can.send', address = 0xff,data = bytearray([0x10]))
-        self.stop_all
+        pub.sendMessage('can.send', message = {"address": 0xff,"data": bytearray([0x10])})
+        self.stop_all()
 
 if __name__ == "__main__":
     #to test run script on pi, and a CANBUS node that receives 0x10 command
@@ -71,8 +70,8 @@ if __name__ == "__main__":
     def logger_error(message):
         print("log.error: ", message)
 
-    def logger_receive(message, extra):
-        print("can.receive: ", message, "can.extra: ", extra)
+    def logger_receive(message):
+        print("can.receive: ", message["data"], "can.extra: ", message["extra"])
 
     pub.subscribe(logger_sent, "log.sent")
     pub.subscribe(logger_error, "log.error")
@@ -82,15 +81,3 @@ if __name__ == "__main__":
     can_handler.start(1)
     test_case_send = __Test_Case_Send__()
     test_case_send.start(1)
-    AsyncModuleManager = AsyncModuleManager()
-    AsyncModuleManager.register_modules(can_handler, test_case_send)
-
-    try:
-        AsyncModuleManager.run_forever()
-    except KeyboardInterrupt:
-        pass
-    except BaseException:
-        pass
-    finally:
-        print("Closing Loop")
-        AsyncModuleManager.stop_all()

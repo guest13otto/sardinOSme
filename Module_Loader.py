@@ -1,6 +1,6 @@
 import yaml
 
-class Loader(): 
+class Loader():
     def load_all(YAML_File):
         nodes = []
         try:
@@ -34,11 +34,10 @@ class Loader():
                     pass
 
                 #Execute one node
-                exec(f"from {file} import {varclass}") 
+                exec(f"from {file} import {varclass}")
                 _node = eval(varclass +"(" + args +")")
                 nodes.append( { "node": _node, "class": varclass, "frequency": frequency, "args": args} )
                 print(f"{nodeName} successfully loaded")
         except FileNotFoundError:
             print('File not found')
         return nodes
-

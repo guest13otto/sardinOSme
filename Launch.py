@@ -12,7 +12,10 @@ nodes = Loader.load_all(config_name)
 
 for n in nodes:
     n["node"].start(n["frequency"])
-    AsyncModuleManager.register_module(n["node"])
+    try:
+        AsyncModuleManager.register_module(n["node"])
+    except BaseException:
+        pass
 
 try:
     AsyncModuleManager.run_forever()
