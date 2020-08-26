@@ -1,7 +1,7 @@
 Gamepad:
   file: Gamepad
   varclass: Gamepad
-  frequency: 120
+  frequency: 360
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile
@@ -37,11 +37,14 @@ ThrusterPower:
 Thrusters:
   file: Thrusters
   varclass: Thrusters
-  frequency: 120
-#Logger:
-#  file: Logger
-#  varclass: Logger
-#  frequency: 1
+  frequency: 360
+Logger:
+  file: Logger
+  varclass: Logger
+  frequency: 1
+  Print: True
+  Log: True
+  Topics: "gamepad" #All Topicss: gamepad, command, Thruster, can, log
 #CAN_Handler:
 #  file: CAN_Handler
 #  varclass: CAN_Handler

@@ -35,6 +35,7 @@ from inputs import get_gamepad
 from pubsub import pub
 from Module_Base_Async import Module
 from Module_Base_Async import AsyncModuleManager
+import asyncio
 
 
 def normalize(X, constant = Normalize_Constant):
@@ -82,10 +83,25 @@ class Gamepad(Module):
         self.active = True #[True, False, False]  #Analog, South, West
         self.show_transectline = False
         self.thumb_profile_cycle = 0
+        self.tt = 0
 
-    @Module.threadloop(1)
-    def run(self):
-        events= get_gamepad()
+    @Module.asyncloop(1)
+    async def run2(self):
+        def ttt():
+            self.tt += 1
+            time.sleep(1)
+            return self.tt
+
+        loop = asyncio.get_running_loop()
+        events = await loop.run_in_executor(None, ttt)
+        print(events)
+
+    @Module.asyncloop(1)
+    async def run(self):
+        loop = asyncio.get_running_loop()
+
+        events = await loop.run_in_executor(None, get_gamepad)
+        print(events)
         analogcode = None
         for event in events:
             if self.active:
@@ -138,17 +154,21 @@ class Gamepad(Module):
                     self.control_invert = not self.control_invert
                     pub.sendMessage("gamepad.invert", message = {"invert": self.control_invert}) #For GUI
 
+
+
 if __name__ == "__main__":
     import time
     def debug_listener_movement(message):
-        print(message["gamepad_message"])
+        pass
+        #print(asyncio.get_event_loop())
+        #print(message["gamepad_message"])
 
     def debug_listener_profile(message):
         print("\t\t\t\t\t", message["Profile_Dict"])
         #time.sleep(1)
 
     debug = Gamepad()
-    debug.start(240)
+    debug.start(10)
     pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
     AsyncModuleManager = AsyncModuleManager()
