@@ -1,7 +1,7 @@
 Gamepad:
   file: Gamepad
   varclass: Gamepad
-  frequency: 100
+  frequency: 120
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile
@@ -37,7 +37,7 @@ ThrusterPower:
 Thrusters:
   file: Thrusters
   varclass: Thrusters
-  frequency: 100
+  frequency: 120
 #Logger:
 #  file: Logger
 #  varclass: Logger

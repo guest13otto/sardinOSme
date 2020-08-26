@@ -44,7 +44,7 @@ class CAN_Handler(Module):
         except can.CanError:
             pub.sendMessage("log.error" , message = msg)
 
-
+    @Module.threadloop(1)
     def run(self):
         message = self.bus.recv(1)
         #print("received:", message)

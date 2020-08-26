@@ -82,6 +82,7 @@ class Gamepad(Module):
         self.thumb_profile_cycle = 0
         super().__init__()
 
+    @Module.threadloop(1)
     def run(self):
         events= get_gamepad()
         analogcode = None

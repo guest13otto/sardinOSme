@@ -53,6 +53,7 @@ class Thrusters(Module):
                     self.target_power[0][counter] = 0
             #print(self.target_power)
 
+    @Module.asyncloop(1)
     def run(self):
         rate = self.rate * self.interval
         for list in self.target_power:
