@@ -96,6 +96,7 @@ class Thread_Task():
         def is_activated(self):
             return self.__is_activated
 
+
     def __init__(self, target, record_name = None, args=(), kwargs={}):
         self._running = self.run_flag()
         self.target = target
@@ -129,6 +130,12 @@ class Thread_Task():
 
 
 class Module():
+    @staticmethod
+    async def __main_run__():
+        while True:
+            await asyncio.sleep(2)
+
+    asyncio.ensure_future(__main_run__.__func__())
     def __init__(self):
         self.destroyed = False
         self.relative_speed_multiplier = {}     # {"Test.run": [<function Test.test at 0x...>, 10]}
@@ -138,12 +145,15 @@ class Module():
         self.set_task_args_kwargs = {}          # {"Test.pub_handler":[<bound method Test.pub_handler>, [1, 3, "arg"], {"a": 2, "b": 5}]}    
     
     async def exec_periodically(self, wait_time, func, special_run = False):
-        while True:
-            await asyncio.sleep(wait_time)
-            if special_run:
-                func()
-            else:
-                func(self)
+        try:
+            while True:
+                await asyncio.sleep(wait_time)
+                if special_run:
+                    func()
+                else:
+                    func(self)
+        except Exception as e:
+            print(e)
 
     async def async_exec_periodically(self, wait_time, coro, special_run = False):
         while True:
@@ -154,9 +164,19 @@ class Module():
                 await coro(self)
 
     def thread_exec_periodically(self, wait_time, func, **kwargs):
+        '''
         while kwargs["__thread__"].is_activated():
             time.sleep(wait_time)
+            func(self)'''
+        
+        #print(wait_time)
+        stopEvent = threading.Event()
+        nextTime=time.time()+wait_time
+        while (not stopEvent.wait(nextTime-time.time())) and kwargs["__thread__"].is_activated():
+            nextTime+=wait_time
             func(self)
+
+        
 
     def thread_exec_once(self, func, **kwargs):
         if kwargs["__thread__"].is_activated():
@@ -476,6 +496,7 @@ if __name__ == "__main__":
             while True:
                 print("#@#@#@#@#@#@$@#@#@#@#@#@#@#@#")
                 await asyncio.sleep(2)
+                print(len(asyncio.all_tasks()))
 
         @Module.asyncloop(0.2)
         async def run2(self):
