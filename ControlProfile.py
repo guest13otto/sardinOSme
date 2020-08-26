@@ -31,6 +31,7 @@ class ControlProfile(Module):
         self.activate = activate
         self.profile_change = 'A'
 
+    @Module.asyncloop(1)
     def run(self):
         pass
 

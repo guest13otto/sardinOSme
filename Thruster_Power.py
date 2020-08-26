@@ -133,6 +133,7 @@ class Thruster_Power(Module):
         finalList = [item for item in finalList if isinstance(item,list)]
         pub.sendMessage("Thruster.Power", message = {"Thruster_message": finalList})
 
+    @Module.asyncloop(1)
     def run(self):
         pass
 

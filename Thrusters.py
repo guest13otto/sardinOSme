@@ -75,7 +75,7 @@ class Thrusters(Module):
                 pub.sendMessage("can.send", message = {"address": self.Thrusters[counter]["Address"], "data": [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff]})
         #print(f"difference: {self.difference}")
         #print(f"current_power: {self.current_power}")
-        #print(f"output_power: {self.output_power}")
+        print(f"output_power: {self.output_power}")
         #print(self.Thrusters[0]["Address"])
         #print(f"rate: {rate}")
 

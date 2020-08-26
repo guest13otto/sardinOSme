@@ -33,7 +33,8 @@ ProfileDict = {'BTN_THUMB0': 'A',
 # variables
 from inputs import get_gamepad
 from pubsub import pub
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 
 
 def normalize(X, constant = Normalize_Constant):
@@ -65,6 +66,7 @@ def half_movement_value_split(full_value):
 
 class Gamepad(Module):
     def __init__(self):
+        super().__init__()
         #pub.subscribe(self.south_listener, 'transectline')
         self.drive = 0
         self.strafe = 0
@@ -80,8 +82,8 @@ class Gamepad(Module):
         self.active = True #[True, False, False]  #Analog, South, West
         self.show_transectline = False
         self.thumb_profile_cycle = 0
-        super().__init__()
 
+    @Module.threadloop(1)
     def run(self):
         events= get_gamepad()
         analogcode = None
@@ -146,6 +148,18 @@ if __name__ == "__main__":
         #time.sleep(1)
 
     debug = Gamepad()
-    debug.start(100)
+    debug.start(240)
     pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
+    AsyncModuleManager = AsyncModuleManager()
+    AsyncModuleManager.register_modules(debug)
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()
