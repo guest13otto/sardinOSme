@@ -25,7 +25,8 @@ can.receive.<arbitration_id>:
 '''
 
 import can
-from Module_Base import Module
+from Module_Base_Async import Module
+from Module_Base_Async import AsyncModuleManager
 from pubsub import pub
 
 class CAN_Handler(Module):
@@ -81,3 +82,15 @@ if __name__ == "__main__":
     can_handler.start(1)
     test_case_send = __Test_Case_Send__()
     test_case_send.start(1)
+    AsyncModuleManager = AsyncModuleManager()
+    AsyncModuleManager.register_modules(test_case_send, can_handler)
+
+    try:
+        AsyncModuleManager.run_forever()
+    except KeyboardInterrupt:
+        pass
+    except BaseException:
+        pass
+    finally:
+        print("Closing Loop")
+        AsyncModuleManager.stop_all()
