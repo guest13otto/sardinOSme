@@ -6,7 +6,7 @@ class Axis(pygame.sprite.Sprite):
         super().__init__()
         self.screen = screen
         self.xlim = screen_width - (xliftoff + 10)
-        self.ylim = bar_width * (12*2+1)
+        self.ylim = bar_width * (6*2+1)
         self.xliftoff = xliftoff
         self.yliftoff = yliftoff
         self.screen_width = screen_width
@@ -34,9 +34,10 @@ class Axis(pygame.sprite.Sprite):
                 display_text('1', self.screen, x, y+15, 'center', 'b', 14)
 
         # draw y axis
-        yStart = (self.screen_width/2, self.screen_height-self.yliftoff-self.ylim)
-        yEnd = (self.screen_width/2, self.screen_height-self.yliftoff)
+        yStart = (self.xliftoff+self.xlim/2, self.screen_height-self.yliftoff-self.ylim)
+        yEnd = (self.xliftoff+self.xlim/2, self.screen_height-self.yliftoff)
         pygame.draw.line(self.screen, magenta, yStart, yEnd, axis_width)
+        return self.screen
 
 
 def display_text(text, screen, x, y, alignment, colour, size):

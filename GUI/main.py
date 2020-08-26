@@ -1,7 +1,7 @@
 import pygame
 from Module_Base_Async import Module, AsyncModuleManager
 from plot import Plot
-from plot2 import Plot2
+#from plot2 import Plot2
 #from Gamepad import Gamepad
 from pubsub import pub
 import random
@@ -30,8 +30,8 @@ class GUI(Module):
         self.widgets.append((popup.ProfilePopup(), (0, 0)))
 
         self.charts = []
-        self.charts.append((Plot2(['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
-        self.charts.append((Plot2(['FL', 'FR', 'BL', 'BR', 'TL', 'TR'], self.screen_width, self.screen_height), (self.screen_width/2, 0), 1))
+        self.charts.append((Plot(['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
+        self.charts.append((Plot(['FL', 'FR', 'BL', 'BR', 'TL', 'TR'], self.screen_width, self.screen_height), (self.screen_width/2, 0), 1))
 
     def run(self):
         self.clock.tick(30)

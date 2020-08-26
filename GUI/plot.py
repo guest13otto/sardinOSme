@@ -8,26 +8,46 @@ from pubsub import pub
 
 
 class Plot:
-    def __init__(self, screen, screen_width, screen_height):
-        self.screen = screen
+    def __init__(self, labels, screen_width, screen_height):
+        self.screen_width = screen_width / 2
+        self.screen_height = screen_height
+        self.screen = pygame.Surface((self.screen_width, self.screen_height))
         self.xliftoff = 50
         self.yliftoff = 30
-        self.bar_width = 10
-        self.axes = Axis(screen, screen_width, screen_height, self.xliftoff, self.yliftoff, self.bar_width)
-        self.directions = [Bar(i, screen, screen_width, screen_height, self.xliftoff, self.yliftoff, self.bar_width)
-                           for i in range(12)]
+        self.bar_width = 20
+        self.labels = labels
+        self.axes = Axis(self.screen, self.screen_width, self.screen_height, self.xliftoff, self.yliftoff, self.bar_width)
         #self.profile = Profile(screen, screen_width, screen_height)
         self.textTR = Label(screen_width-7, 10, 'right', (0, 0, 0), 14)
+        self.movement = 0
+        self.profile = 0
+        self.power = 0
+        self.charts = 0
+        pub.subscribe(self.movement_handler, "gamepad.movement")
+        pub.subscribe(self.profile_handler, "gamepad.profile")
+        pub.subscribe(self.power_handler, "thruster.power")
 
-    def update(self, movement, profile, power):
-        labels = ['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero', 'FL', 'FR', 'BL', 'BR', 'TL', 'TR']
-        values = np.concatenate((movement, power))
+    def update(self, order):
+        self.update_charts()
+        values = self.charts[order]
+        directions = [Bar(i, self.screen, self.screen_width, self.screen_height, self.xliftoff, self.yliftoff, self.bar_width)
+                           for i in range(6)]
         self.screen.fill((200, 200, 255))
+        self.screen = self.axes.draw()
 
-        for i in range(12):
-            self.directions[i].draw(values[i], labels[i])
+        for i in range(6):
+            self.screen = directions[i].draw(self.screen, values[i], self.labels[i])
 
-        self.axes.draw()
+        return self.screen
 
-        if profile >= 0:
-            self.textTR.set_text(('profile '+str(profile)), self.screen)
+    def movement_handler(self, message):
+        self.movement = message
+
+    def profile_handler(self, message):
+        self.profile = message
+
+    def power_handler(self, message):
+        self.power = message
+
+    def update_charts(self):
+        self.charts = [self.movement, self.power]
