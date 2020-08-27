@@ -135,19 +135,19 @@ class Gamepad(Module):
 
                 if controlcode == 'BTN_TL' and event.state != 0:
                     self.EM1_L += event.state
-                    pub.sendMessage("gamepad.EM1_L", message = {"EM": self.EM1_L%2})
+                    pub.sendMessage("gamepad.EM1", message = {"EM_L": self.EM1_L%2, "EM_R": self.EM1_R%2})
 
                 if controlcode == 'BTN_TR' and event.state != 0:
                     self.EM1_R += event.state
-                    pub.sendMessage("gamepad.EM1_R", message = {"EM": self.EM1_R%2})
+                    pub.sendMessage("gamepad.EM1", message = {"EM_L": self.EM1_L%2, "EM_R": self.EM1_R%2})
 
                 if controlcode == 'ABS_HAT0X':
                     if event.state == -1:
                         self.EM2_L += 1
-                        pub.sendMessage("gamepad.EM2_L", message = {"EM": self.EM2_L%2})
+                        pub.sendMessage("gamepad.EM2", message = {"EM_L": self.EM2_L%2, "EM_R": self.EM2_R%2})
                     if event.state == 1:
                         self.EM2_R += 1
-                        pub.sendMessage("gamepad.EM2_R", message = {"EM": self.EM2_R%2})
+                        pub.sendMessage("gamepad.EM2", message = {"EM_L": self.EM2_L%2, "EM_R": self.EM2_R%2})
 
                 if (controlcode == "BTN_SOUTH") and (event.state == 1):
                     pass
@@ -163,17 +163,23 @@ class Gamepad(Module):
 if __name__ == "__main__":
     import time
     def debug_listener_movement(message):
-        #print(asyncio.get_event_loop())
-        print(message["gamepad_message"])
+        pass
+        #print(message["gamepad_message"])
 
     def debug_listener_profile(message):
         print("\t\t\t\t\t", message["Profile_Dict"])
         #time.sleep(1)
+    def debug_listener_EM1(message):
+        print("EM1: ", message)
+    def debug_listener_EM2(message):
+        print("EM2: ", message)
 
     debug = Gamepad()
     debug.start(120)
     pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
+    pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
+    pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     AsyncModuleManager = AsyncModuleManager()
     AsyncModuleManager.register_modules(debug)
 
