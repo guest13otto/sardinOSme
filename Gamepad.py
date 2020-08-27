@@ -163,8 +163,7 @@ class Gamepad(Module):
 if __name__ == "__main__":
     import time
     def debug_listener_movement(message):
-        pass
-        #print(message["gamepad_message"])
+        print(message["gamepad_message"])
 
     def debug_listener_profile(message):
         print("\t\t\t\t\t", message["Profile_Dict"])

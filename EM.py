@@ -20,15 +20,16 @@ class EM(Module):
         pass
 
     def Listener(self, message):
+        print(message)
         if message["EM_L"]:
-            pub.sendMessage("can.send", message = {"address": self.address, "data": [0x30, 0x10]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
         else:
-            pub.sendMessage("can.send", message = {"address": self.address, "data": [0x30, 0x00]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x00]})
 
         if message["EM_R"]:
-            pub.sendMessage("can.send", message = {"address": self.address, "data": [0x31, 0x10]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
         else:
-            pub.sendMessage("can.send", message = {"address": self.address, "data": [0x31, 0x00]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})
 
 
 class __Test_Case_Send__(Module):
@@ -43,15 +44,18 @@ class __Test_Case_Send__(Module):
         print(message)
 
 if __name__ == "__main__":
+    from Gamepad import Gamepad
 
     EM1 = EM("EM1", 0x31)
     EM2 = EM("EM2", 0x32)
     EM1.start(1)
     EM2.start(1)
+    Gamepad = Gamepad()
+    Gamepad.start(10)
     __Test_Case_Send__ = __Test_Case_Send__()
-    __Test_Case_Send__.start(1)
+    #__Test_Case_Send__.start(1)
     AsyncModuleManager = AsyncModuleManager()
-    AsyncModuleManager.register_modules(EM1, EM2, __Test_Case_Send__)
+    AsyncModuleManager.register_modules(Gamepad, EM1, EM2, __Test_Case_Send__)
 
     try:
         AsyncModuleManager.run_forever()
