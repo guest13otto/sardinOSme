@@ -54,7 +54,8 @@ class Thrusters(Module):
             #print(self.target_power)
     @Module.loop(1)
     def run(self):
-        rate = self.rate * self.interval
+        rate = self.rate * (1 / self.interval)
+        #print("rate: ", rate)
         for list in self.target_power:
             for counter, power in enumerate(list):
                 self.difference[counter] = power - self.current_power[counter]

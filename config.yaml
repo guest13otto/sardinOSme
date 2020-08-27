@@ -56,7 +56,7 @@ Logger:
   frequency: 1
   Print: True
   Log: True
-  Topics: "none" #All Topicss: gamepad, command, Thruster, info, can, log
+  Topics: "info" #All Topicss: gamepad, command, Thruster, info, can, log
 CAN_Handler:
   file: CAN_Handler
   varclass: CAN_Handler
