@@ -47,12 +47,13 @@ class CAN_Handler(Module):
 
     @Module.asyncloop(1)
     async def run(self):
-        message = self.bus.recv(1)
+        pass
+        '''message = self.bus.recv(1)
         #print("received:", message)
         if message != None:
             topic_name = "can.receive." + str(hex(message.arbitration_id))[2:]
             #print("topic_name: ", topic_name)
-            pub.sendMessage(topic_name, message  = {"data": message.data, "extra": {"timestamp": message.timestamp}})
+            pub.sendMessage(topic_name, message  = {"data": message.data, "extra": {"timestamp": message.timestamp}})'''
 
 
 class __Test_Case_Send__(Module):

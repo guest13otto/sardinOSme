@@ -83,16 +83,15 @@ class Gamepad(Module):
         self.active = True #[True, False, False]  #Analog, South, West
         self.show_transectline = False
         self.thumb_profile_cycle = 0
-        self.tt = 0
 
     @Module.asyncloop(1)
     async def run2(self):
-        self.tt+=1
-        pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message, "gamepad_counter" : self.tt})
+        pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message})
 
     @Module.asyncloop(10)
     async def run(self):
-        events = get_gamepad()
+        loop = asyncio.get_running_loop()
+        events = await loop.run_in_executor(None, get_gamepad)
         analogcode = None
         for event in events:
             if self.active:
