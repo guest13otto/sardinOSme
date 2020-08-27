@@ -1,9 +1,8 @@
 import pygame
 import numpy as np
-from axis import Axis, display_text
+from axis import Axis
 from bar import Bar
 from profile import Profile
-from label import Label
 from pubsub import pub
 
 
@@ -17,8 +16,6 @@ class Plot:
         self.bar_width = 20
         self.labels = labels
         self.axes = Axis(self.screen, self.screen_width, self.screen_height, self.xliftoff, self.yliftoff, self.bar_width)
-        #self.profile = Profile(screen, screen_width, screen_height)
-        self.textTR = Label(screen_width-7, 10, 'right', (0, 0, 0), 14)
         self.movement = 0
         self.profile = 0
         self.power = 0
