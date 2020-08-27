@@ -87,21 +87,12 @@ class Gamepad(Module):
 
     @Module.asyncloop(1)
     async def run2(self):
-        def ttt():
-            self.tt += 1
-            time.sleep(1)
-            return self.tt
+        self.tt+=1
+        pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message, "gamepad_counter" : self.tt})
 
-        loop = asyncio.get_running_loop()
-        events = await loop.run_in_executor(None, ttt)
-        print(events)
-
-    @Module.asyncloop(1)
+    @Module.asyncloop(10)
     async def run(self):
-        loop = asyncio.get_running_loop()
-
-        events = await loop.run_in_executor(None, get_gamepad)
-        print(events)
+        events = get_gamepad()
         analogcode = None
         for event in events:
             if self.active:
@@ -127,8 +118,8 @@ class Gamepad(Module):
                     self.movement_message = (self.strafe, self.drive, self.yaw, self.updown, self.tilt, 0)
                 else:
                     self.movement_message = (-self.strafe, -self.drive, self.yaw,  self.updown, -self.tilt, 0)
-                #pub_to_manager('movement', message = self.movement_message)
-                pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message})
+
+                #pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message})
 
                 hatcode = event.code[0:8]
                 controlcode = event.code
@@ -159,16 +150,15 @@ class Gamepad(Module):
 if __name__ == "__main__":
     import time
     def debug_listener_movement(message):
-        pass
         #print(asyncio.get_event_loop())
-        #print(message["gamepad_message"])
+        print(message["gamepad_message"])
 
     def debug_listener_profile(message):
         print("\t\t\t\t\t", message["Profile_Dict"])
         #time.sleep(1)
 
     debug = Gamepad()
-    debug.start(10)
+    debug.start(120)
     pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
     AsyncModuleManager = AsyncModuleManager()

@@ -45,8 +45,8 @@ class CAN_Handler(Module):
         except can.CanError:
             pub.sendMessage("log.error" , message = msg)
 
-    @Module.threadloop(1)
-    def run(self):
+    @Module.asyncloop(1)
+    async def run(self):
         message = self.bus.recv(1)
         #print("received:", message)
         if message != None:

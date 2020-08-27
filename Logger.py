@@ -34,6 +34,7 @@ class Logger(Module):
         if self.Print:
             print(message)
         if self.Log:
+            pass
 
     def run(self):
         pass
