@@ -37,15 +37,15 @@ ThrusterPower:
 Thrusters:
   file: Thrusters
   varclass: Thrusters
-  frequency: 60
+  frequency: 10
 Logger:
   file: Logger
   varclass: Logger
   frequency: 1
   Print: True
   Log: True
-  Topics: "can" #All Topicss: gamepad, command, Thruster, info, can, log
-#CAN_Handler:
-#  file: CAN_Handler
-#  varclass: CAN_Handler
-#  frequency: 1
+  Topics: "info" #All Topicss: gamepad, command, Thruster, info, can, log
+CAN_Handler:
+  file: CAN_Handler
+  varclass: CAN_Handler
+  frequency: 1
