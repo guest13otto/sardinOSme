@@ -38,6 +38,16 @@ Thrusters:
   file: Thrusters
   varclass: Thrusters
   frequency: 10
+EM1:
+  file: EM
+  varclass: EM
+  frequency: 1
+  address: 0x31
+EM2:
+  file: EM
+  varclass: EM
+  frequency: 1
+  address: 0x32
 Logger:
   file: Logger
   varclass: Logger

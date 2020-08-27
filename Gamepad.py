@@ -83,13 +83,17 @@ class Gamepad(Module):
         self.active = True #[True, False, False]  #Analog, South, West
         self.show_transectline = False
         self.thumb_profile_cycle = 0
+        self.EM1_L = 0
+        self.EM1_R = 0
+        self.EM2_L = 0
+        self.EM2_R = 0
 
     @Module.asyncloop(1)
     async def run2(self):
         pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message})
 
     @Module.asyncloop(10)
-    async def run(self):
+    async def run3(self):
         loop = asyncio.get_running_loop()
         events = await loop.run_in_executor(None, get_gamepad)
         analogcode = None
@@ -130,15 +134,25 @@ class Gamepad(Module):
                     pub.sendMessage("gamepad.profile", message = {"Profile_Dict": ProfileDict[str(event.code[:-1])+str(self.thumb_profile_cycle)]})
 
                 if controlcode == 'BTN_TL' and event.state != 0:
-                    pass #EM
+                    self.EM1_L += event.state
+                    pub.sendMessage("gamepad.EM1_L", message = {"EM": self.EM1_L%2})
 
                 if controlcode == 'BTN_TR' and event.state != 0:
-                    pass #EM
+                    self.EM1_R += event.state
+                    pub.sendMessage("gamepad.EM1_R", message = {"EM": self.EM1_R%2})
+
+                if controlcode == 'ABS_HAT0X':
+                    if event.state == -1:
+                        self.EM2_L += 1
+                        pub.sendMessage("gamepad.EM2_L", message = {"EM": self.EM2_L%2})
+                    if event.state == 1:
+                        self.EM2_R += 1
+                        pub.sendMessage("gamepad.EM2_R", message = {"EM": self.EM2_R%2})
 
                 if (controlcode == "BTN_SOUTH") and (event.state == 1):
                     pass
-                    pub.sendMessage("gamepad.movement_activation", message = {"activate": "transectline"})
-                    pub.sendMessage("gamepad.show_transectline", message = {"show": not self.show_transectline})
+                    '''pub.sendMessage("gamepad.movement_activation", message = {"activate": "transectline"})
+                    pub.sendMessage("gamepad.show_transectline", message = {"show": not self.show_transectline})'''
 
                 if (controlcode == "BTN_WEST") and (event.state == 1):
                     self.control_invert = not self.control_invert
