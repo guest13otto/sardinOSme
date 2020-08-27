@@ -75,7 +75,6 @@ class __Test_Case_Send__(Module):
     def run(self):
         pub.sendMessage("gamepad.movement", message = {"gamepad_message": (0.2,0,0,0,0,0)})
         pub.sendMessage("gamepad.profile", message = {"Profile_Dict": 'A'})
-        self.stop_all()
 
 if __name__ == "__main__":
     from Gamepad import Gamepad
