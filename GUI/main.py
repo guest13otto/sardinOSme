@@ -1,7 +1,6 @@
 import pygame
 from Module_Base_Async import Module, AsyncModuleManager
 from plot import Plot
-#from plot2 import Plot2
 #from Gamepad import Gamepad
 from pubsub import pub
 import random
@@ -21,13 +20,9 @@ class GUI(Module):
         self.movement = [0 for i in range(6)]
         self.power = [0 for i in range(6)]
         self.profile = -1
-        #pub.subscribe(self.test_handler, 'test.send')
-        #pub.subscribe(self.movement_handler, 'gamepad.movement')
-        #pub.subscribe(self.power_handler, 'thruster.power')
-        #pub.subscribe(self.profile_handler, 'gamepad.profile')
 
         self.widgets = []
-        self.widgets.append((popup.ProfilePopup(), (0, 0)))
+        self.widgets.append((popup.ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
 
         self.charts = []
         self.charts.append((Plot(['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
@@ -46,7 +41,6 @@ class GUI(Module):
 
         pygame.display.flip()
         for event in pygame.event.get():
-            print(event)
             if event.type == pygame.QUIT:
                 pygame.quit()
 
@@ -75,7 +69,6 @@ class TestCaseSend(Module):
         self.movement = [random.uniform(-1.0, 1.0) for i in range(5)]
         self.movement.append(0.000)
         pub.sendMessage('gamepad.movement', message=self.movement)
-        #print(self.movement)
 
     @Module.loop(0.003)
     def run2(self):
@@ -87,7 +80,6 @@ class TestCaseSend(Module):
     def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
         pub.sendMessage('thruster.power', message=self.power)
-        #print(self.power)
 
 
 if __name__ == "__main__":

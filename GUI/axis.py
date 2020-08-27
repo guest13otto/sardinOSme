@@ -1,4 +1,5 @@
 import pygame
+from label import display_text
 
 
 class Axis(pygame.sprite.Sprite):
@@ -38,21 +39,3 @@ class Axis(pygame.sprite.Sprite):
         yEnd = (self.xliftoff+self.xlim/2, self.screen_height-self.yliftoff)
         pygame.draw.line(self.screen, magenta, yStart, yEnd, axis_width)
         return self.screen
-
-
-def display_text(text, screen, x, y, alignment, colour, size):
-    black = (0, 0, 0)
-    if colour == 'b':
-        colour = black
-    font = pygame.font.SysFont("Courier New", size)
-    textSurf = font.render(text, True, colour)
-    textRect = textSurf.get_rect()
-    if alignment == 'left':
-        textRect.left = x
-        textRect.centery = y
-    elif alignment == 'right':
-        textRect.right = x
-        textRect.centery = y
-    else:
-        textRect.center = (x, y)
-    screen.blit(textSurf, textRect)
