@@ -9,7 +9,7 @@ bottom right (1, 1)
 
 
 class Label:
-    def __init__(self, surface, screen_width, screen_height, position, colour, size):
+    def __init__(self, screen_width, screen_height, position, colour, size):
         if position[1] == 0:
             self.alignment = 'left'
             self.x = 10
@@ -23,10 +23,13 @@ class Label:
         self.colour = colour
         self.size = size
         self.font = pygame.font.SysFont("Courier New", size)
-        self.surface = surface
+        self.surface = pygame.Surface((screen_width, screen_height))
+        self.surface.fill((1, 1, 1))
+        self.surface.set_colorkey((1, 1, 1))
 
     def update(self, text):
         display_text(text, self.surface, self.x, self.y, self.alignment, self.colour, self.size)
+        return self.surface
 
 
 def display_text(text, surface, x, y, alignment, colour, size):

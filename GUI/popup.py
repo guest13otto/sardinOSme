@@ -47,6 +47,6 @@ class ProfilePopup:
             self.surface.fill((1, 1, 1))
             #self.surface.set_alpha(0)
             self.surface.set_colorkey((1, 1, 1))
-            label = Label(self.surface, self.screen_width, self.screen_height, (0, 1), 'b', 14)
-            label.update(self.labels[self.profile])
+            label = Label(self.screen_width, self.screen_height, (0, 1), 'b', 14)
+            self.surface.blit(label.update(self.labels[self.profile]), (0, 0))
         return self.surface
