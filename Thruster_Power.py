@@ -73,7 +73,7 @@ class Thruster_Power(Module):
 
     def invert(self, finalList):
         for counter, Thruster in enumerate(self.Thrusters):
-            if Thruster["Invert"] == True:
+            if Thruster["Invert"] == "True":
                 finalList[counter, 0] *= -1
         if Print:
             print("invert out: ", finalList.reshape(1,6))

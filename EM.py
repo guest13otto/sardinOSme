@@ -22,14 +22,14 @@ class EM(Module):
     def Listener(self, message):
         print(message)
         if message["EM_L"]:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
-        else:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x00]})
-
-        if message["EM_R"]:
             pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
         else:
             pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})
+
+        if message["EM_R"]:
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
+        else:
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x00]})
 
 
 class __Test_Case_Send__(Module):
