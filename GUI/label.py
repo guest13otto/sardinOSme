@@ -27,7 +27,6 @@ class Label:
 
     def update(self, text):
         display_text(text, self.surface, self.x, self.y, self.alignment, self.colour, self.size)
-        #return self.surface
 
 
 def display_text(text, surface, x, y, alignment, colour, size):

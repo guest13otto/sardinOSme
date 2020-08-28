@@ -68,18 +68,19 @@ class TestCaseSend(Module):
     def run(self):
         self.movement = [random.uniform(-1.0, 1.0) for i in range(5)]
         self.movement.append(0.000)
-        pub.sendMessage('gamepad.movement', message=self.movement)
+        pub.sendMessage('gamepad.movement', message={"gamepad_message": self.movement})
 
     @Module.loop(0.003)
     def run2(self):
-        self.profile = random.randint(0, 3)
-        pub.sendMessage('gamepad.profile', message=self.profile)
+        pArr = ['A', 'B', 'C', 'D']
+        self.profile = pArr[random.randint(0, 3)]
+        pub.sendMessage('gamepad.profile', message={"gamepad_profile": self.profile})
         print(self.profile)
 
     @Module.loop(1)
     def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
-        pub.sendMessage('thruster.power', message=self.power)
+        pub.sendMessage('thruster.power', message={"thruster_message": self.power})
 
 
 if __name__ == "__main__":

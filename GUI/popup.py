@@ -16,15 +16,19 @@ class ProfilePopup:
         purple = (124, 121, 162)
         coral = (245, 125, 124)
         self.colours = [teal, blue, purple, coral]
-        self.labels = ['profile ' + str(i) for i in range(4)]
+        self.pArr = ['A', 'B', 'C', 'D']
+        self.labels = ['profile ' + self.pArr[i] for i in range(4)]
         self.font = pygame.font.SysFont("Courier New", 32)
         pub.subscribe(self.profile_handler, "gamepad.profile")
         self.expired = time.time()
 
     def profile_handler(self, message):
-        self.set_profile(message)
+        self.set_profile(message["gamepad_profile"])
 
     def set_profile(self, profile):
+        for i in range(len(self.pArr)):
+            if profile == self.pArr[i]:
+                profile = i
         if profile != self.profile:
             self.expired = time.time() + 2
         self.profile = profile
@@ -46,4 +50,4 @@ class ProfilePopup:
             label = Label(self.surface, self.screen_width, self.screen_height, (0, 1), 'b', 14)
             label.update(self.labels[self.profile])
             #self.surface.blit(label.update(self.labels[self.profile]), (0, 0))
-        return self.surface #, textSurf, textRect
+        return self.surface

@@ -38,13 +38,13 @@ class Plot:
         return self.screen
 
     def movement_handler(self, message):
-        self.movement = message
+        self.movement = message["gamepad_message"]
 
     def profile_handler(self, message):
         self.profile = message
 
     def power_handler(self, message):
-        self.power = message
+        self.power = message["thruster_message"]
 
     def update_charts(self):
         self.charts = [self.movement, self.power]
