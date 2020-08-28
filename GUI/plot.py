@@ -22,7 +22,7 @@ class Plot:
         self.charts = 0
         pub.subscribe(self.movement_handler, "gamepad.movement")
         pub.subscribe(self.profile_handler, "gamepad.profile")
-        pub.subscribe(self.power_handler, "thruster.power")
+        pub.subscribe(self.power_handler, "Thruster.Power")
 
     def update(self, order):
         self.update_charts()
@@ -44,7 +44,7 @@ class Plot:
         self.profile = message
 
     def power_handler(self, message):
-        self.power = message["thruster_message"]
+        self.power = message["Thruster_message"]
 
     def update_charts(self):
         self.charts = [self.movement, self.power]

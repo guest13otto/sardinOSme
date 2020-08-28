@@ -72,12 +72,12 @@ class TestCaseSend(Module):
     def run2(self):
         pArr = ['A', 'B', 'C', 'D']
         self.profile = pArr[random.randint(0, 3)]
-        pub.sendMessage('gamepad.profile', message={"gamepad_profile": self.profile})
+        pub.sendMessage('gamepad.profile', message={"Profile_Dict": self.profile})
 
     @Module.loop(1)
     def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
-        pub.sendMessage('thruster.power', message={"thruster_message": self.power})
+        pub.sendMessage('Thruster.Power', message={"Thruster_message": self.power})
 
 
 if __name__ == "__main__":

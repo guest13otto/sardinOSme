@@ -23,7 +23,7 @@ class ProfilePopup:
         self.expired = time.time()
 
     def profile_handler(self, message):
-        self.set_profile(message["gamepad_profile"])
+        self.set_profile(message["Profile_Dict"])
 
     def set_profile(self, profile):
         for i in range(len(self.pArr)):
@@ -49,5 +49,4 @@ class ProfilePopup:
             self.surface.set_colorkey((1, 1, 1))
             label = Label(self.surface, self.screen_width, self.screen_height, (0, 1), 'b', 14)
             label.update(self.labels[self.profile])
-            #self.surface.blit(label.update(self.labels[self.profile]), (0, 0))
         return self.surface
