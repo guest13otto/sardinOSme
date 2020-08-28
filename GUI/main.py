@@ -31,8 +31,6 @@ class GUI(Module):
     def run(self):
         self.clock.tick(30)
 
-        #self.plot.update(self.movement, self.profile, self.power)
-
         for chart in self.charts:
             pygame.display.get_surface().blit(chart[0].update(chart[2]), chart[1])
 
@@ -75,7 +73,6 @@ class TestCaseSend(Module):
         pArr = ['A', 'B', 'C', 'D']
         self.profile = pArr[random.randint(0, 3)]
         pub.sendMessage('gamepad.profile', message={"gamepad_profile": self.profile})
-        print(self.profile)
 
     @Module.loop(1)
     def run3(self):

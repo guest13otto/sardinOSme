@@ -27,12 +27,8 @@ class Axis(pygame.sprite.Sprite):
         for i in range(21):
             x = self.xliftoff+xDiv*(i+1)
             pygame.draw.line(self.screen, magenta, (x, y-5), (x, y+5), axis_width)
-            if i == 0:
-                display_text('-1', self.screen, x, y+15, 'center', 'b', 14)
-            elif i == 10:
-                display_text('0', self.screen, x, y+15, 'center', 'b', 14)
-            elif i == 20:
-                display_text('1', self.screen, x, y+15, 'center', 'b', 14)
+            if i % 10 == 0:
+                display_text(str(int(i/10 - 1)), self.screen, x, y+15, 'center', 'b', 14)
 
         # draw y axis
         yStart = (self.xliftoff+self.xlim/2, self.screen_height-self.yliftoff-self.ylim)
