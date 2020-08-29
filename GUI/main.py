@@ -1,10 +1,16 @@
+import sys, os, inspect
 import pygame
-from Module_Base_Async import Module, AsyncModuleManager
 from plot import Plot
-#from Gamepad import Gamepad
 from pubsub import pub
 import random
-import popup
+from popup import ProfilePopup
+
+#import from parent directory
+currentdir = os.path.dirname(os.path.realpath(__file__))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+from Module_Base_Async import Module, AsyncModuleManager
+from Gamepad import Gamepad
 
 
 class GUI(Module):
@@ -22,7 +28,7 @@ class GUI(Module):
         self.profile = -1
 
         self.widgets = []
-        self.widgets.append((popup.ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
+        self.widgets.append((ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
 
         self.charts = []
         self.charts.append((Plot(['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
@@ -77,7 +83,7 @@ class TestCaseSend(Module):
     @Module.loop(1)
     def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
-        pub.sendMessage('Thruster.Power', message={"Thruster_message": self.power})
+        pub.sendMessage('Thruster.Power', message={"Thruster_message": [self.power]})
 
 
 if __name__ == "__main__":
