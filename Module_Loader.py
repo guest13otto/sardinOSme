@@ -1,12 +1,22 @@
 import yaml
+import sys
+import os
 
 class Loader():
+    @staticmethod
     def load_all(YAML_File):
         nodes = []
         try:
             content = yaml.load(open(str(YAML_File), 'r'), Loader = yaml.FullLoader)
             frequency = 1
             for nodeName in content:
+                #Exceptions
+                if nodeName == "Subfolders":
+                    for folder in content[nodeName]:
+                        currentdir = os.path.dirname(os.path.realpath(__file__))
+                        sys.path.insert(0, currentdir+f"\{folder}")
+                        print(f"{currentdir}\{folder} inserted to sys.path") 
+                    continue
                 args = ''
                 moduleName = content[nodeName]
                 for key in moduleName:

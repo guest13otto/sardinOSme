@@ -47,4 +47,4 @@ class Plot:
         self.power = message["Thruster_message"]
 
     def update_charts(self):
-        self.charts = [self.movement, self.power]
+        self.charts = [self.movement, self.power[0]]

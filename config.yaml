@@ -1,3 +1,4 @@
+Subfolders: [GUI]
 Gamepad:
   file: Gamepad
   varclass: Gamepad
@@ -61,7 +62,7 @@ CAN_Handler:
   file: CAN_Handler
   varclass: CAN_Handler
   frequency: 1
-#GUI:
-#  file: main
-#  varclass: GUI
-#  frequency: 30
+GUI:
+  file: main
+  varclass: GUI
+  frequency: 30
