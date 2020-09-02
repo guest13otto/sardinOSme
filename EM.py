@@ -26,12 +26,12 @@ class EM(Module):
         #pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand[message.key()]})
         '''
         if message["EM_L"]:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
         else:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x00]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})
 
         if message["EM_R"]:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
         else:
             pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})'''
 

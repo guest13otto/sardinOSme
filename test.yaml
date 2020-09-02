@@ -1,4 +1,3 @@
-Subfolders: [GUI]
 Gamepad:
   file: Gamepad
   varclass: Gamepad
@@ -31,38 +30,3 @@ ProfileD:
   activate: 'D'
   max_percentage: 30
   formula_modifier: 50
-ThrusterPower:
-  file: Thruster_Power
-  varclass: Thruster_Power
-  frequency: 1
-Thrusters:
-  file: Thrusters
-  varclass: Thrusters
-  frequency: 10
-EM1:
-  name: EM1
-  file: EM
-  varclass: EM
-  frequency: 1
-  address: 0x30
-EM2:
-  name: EM2
-  file: EM
-  varclass: EM
-  frequency: 1
-  address: 0x32
-Logger:
-  file: Logger
-  varclass: Logger
-  frequency: 1
-  Print: True
-  Log: True
-  Topics: "gamepad.profile" #All Topicss: gamepad, command, Thruster, info, can, log
-CAN_Handler:
-  file: CAN_Handler
-  varclass: CAN_Handler
-  frequency: 1
-GUI:
-  file: main
-  varclass: GUI
-  frequency: 30
