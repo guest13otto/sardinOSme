@@ -2,12 +2,12 @@ from Module_Base_Async import Module
 from Module_Base_Async import AsyncModuleManager
 from pubsub import pub
 import asyncio
-'''
+
 EMLRcommand = {
-                "EM_L": 0x30,
+                "EM_L": {1 : [0x30, 0x10], 0: [0x30, 0x00]},
                 "EM_R": 0x31,
 
-}'''
+                }
 
 class EM(Module):
     def __init__(self, name, address):
@@ -21,6 +21,10 @@ class EM(Module):
 
     def Listener(self, message):
         print(message)
+        print(str(list(message.values())[0]))
+        print(EMLRcommand[str(list(message.keys())[0])][str(list(message.values())[0])])
+        #pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand[message.key()]})
+        '''
         if message["EM_L"]:
             pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
         else:
@@ -29,7 +33,7 @@ class EM(Module):
         if message["EM_R"]:
             pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
         else:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})'''
 
 
 class __Test_Case_Send__(Module):
@@ -38,7 +42,7 @@ class __Test_Case_Send__(Module):
         pub.subscribe(self.Listener, "can.send")
 
     def run(self):
-        pub.sendMessage("gamepad.EM2", message = {"EM_L": 0, "EM_R": 1})
+        pub.sendMessage("gamepad.EM1", message = {"EM_L": 1})
 
     def Listener(self, message):
         print(message)
@@ -46,14 +50,14 @@ class __Test_Case_Send__(Module):
 if __name__ == "__main__":
     from Gamepad import Gamepad
 
-    EM1 = EM("EM1", 0x31)
-    EM2 = EM("EM2", 0x32)
+    EM1 = EM("EM1", '0x31')
+    EM2 = EM("EM2", '0x32')
     EM1.start(1)
     EM2.start(1)
     Gamepad = Gamepad()
     Gamepad.start(10)
     __Test_Case_Send__ = __Test_Case_Send__()
-    #__Test_Case_Send__.start(1)
+    __Test_Case_Send__.start(1)
     AsyncModuleManager = AsyncModuleManager()
     AsyncModuleManager.register_modules(Gamepad, EM1, EM2, __Test_Case_Send__)
 
