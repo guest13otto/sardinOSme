@@ -37,7 +37,12 @@ def display_text(text, surface, x, y, alignment, colour, size):
     if colour == 'b':
         colour = black
     font = pygame.font.SysFont("Courier New", size)
-    textSurf = font.render(text, True, colour)
+    '''
+    8-bit fonts
+    font = pygame.font.SysFont("Fixedsys", size)
+    font = pygame.font.SysFont("System", size)
+    '''
+    textSurf = font.render(text, False, colour)
     textRect = textSurf.get_rect()
     if alignment == 'left':
         textRect.left = x

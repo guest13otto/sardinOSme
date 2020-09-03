@@ -5,12 +5,12 @@ from pubsub import pub
 import random
 from popup import ProfilePopup
 
-#import from parent directory
+# import from parent directory
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from Module_Base_Async import Module, AsyncModuleManager
-from Gamepad import Gamepad
+#from Gamepad import Gamepad
 
 
 class GUI(Module):

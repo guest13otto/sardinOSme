@@ -36,7 +36,6 @@ class ProfilePopup:
     def update(self):
         if self.expired > time.time():
             self.surface.fill(self.colours[self.profile])
-            #self.surface.set_alpha(255)
             self.surface.set_colorkey()
 
             textSurf = self.font.render(self.labels[self.profile], True, (0, 0, 0))
@@ -45,7 +44,6 @@ class ProfilePopup:
             self.surface.blit(textSurf, textRect)
         else:
             self.surface.fill((1, 1, 1))
-            #self.surface.set_alpha(0)
             self.surface.set_colorkey((1, 1, 1))
             label = Label(self.screen_width, self.screen_height, (0, 1), 'b', 14)
             self.surface.blit(label.update(self.labels[self.profile]), (0, 0))
