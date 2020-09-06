@@ -3,10 +3,12 @@ from Module_Base_Async import AsyncModuleManager
 from pubsub import pub
 import asyncio
 
+OnCommand = 0x10
+
+
 EMLRcommand = {
                 "EM_L": {1 : [0x30, 0x10], 0: [0x30, 0x00]},
-                "EM_R": 0x31,
-
+                "EM_R": {1 : [0x31, 0x10], 0: [0x31, 0x00]},
                 }
 
 class EM(Module):
@@ -20,21 +22,8 @@ class EM(Module):
         pass
 
     def Listener(self, message):
-        print(message)
-        print(str(list(message.values())[0]))
-        print(EMLRcommand[str(list(message.keys())[0])][str(list(message.values())[0])])
-        #pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand[message.key()]})
-        '''
-        if message["EM_L"]:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
-        else:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})
-
-        if message["EM_R"]:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x30, 0x10]})
-        else:
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x00]})'''
-
+        pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand[str(list(message.keys())[0])][list(message.values())[0]]})
+        #pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
 
 class __Test_Case_Send__(Module):
     def __init__(self):
@@ -42,7 +31,7 @@ class __Test_Case_Send__(Module):
         pub.subscribe(self.Listener, "can.send")
 
     def run(self):
-        pub.sendMessage("gamepad.EM1", message = {"EM_L": 1})
+        pub.sendMessage("gamepad.EM1", message = {"EM_R": 0})
 
     def Listener(self, message):
         print(message)
