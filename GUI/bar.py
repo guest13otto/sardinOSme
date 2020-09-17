@@ -32,8 +32,8 @@ class Bar(pygame.sprite.Sprite):
         else:
             x = self.xliftoff + self.xlim - (bar_length - 1)
             value = '%.3f' % value
-        display_text(label, self.screen, self.labelx, self.valuey-7, 'left', 'b', 14)
+        display_text(label, self.screen, self.labelx, self.valuey-7, 'left', 14)
         rect = pygame.Rect(x, self.y, bar_length, self.bar_width)
         pygame.draw.rect(self.screen, self.colour, rect)
-        display_text(str(value), self.screen, self.labelx, self.valuey+7, 'left', 'b', 14)
+        display_text(str(value), self.screen, self.labelx, self.valuey+7, 'left', 14)
         return self.screen
