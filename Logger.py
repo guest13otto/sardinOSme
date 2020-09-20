@@ -2,6 +2,7 @@ from pubsub import pub
 from Module_Base_Async import Module
 import yaml
 import logging
+import logging.config
 
 AllTopics = {"Gamepad": 'gamepad',
              "ControlProfile": 'command',
@@ -13,7 +14,11 @@ AllTopics = {"Gamepad": 'gamepad',
 class Logger(Module):
     def __init__(self, Print, Log, Topics):
         super().__init__()
-        logging.basicConfig(filename='console.log', filemode='w', format='%(levelname)s - %(message)s')
+        with open('LoggerConfig.yaml', 'rt') as f:
+            config = yaml.safe_load(f.read())
+            logging.config.dictConfig(config)
+        self.logger = logging.getLogger('simple')
+        #logging.basicConfig(filename='console.log', filemode='w', level = logging.DEBUG, format='%(levelname)s - %(message)s')
         '''try:
             content = yaml.load(open('config.yaml', 'r'), Loader = yaml.FullLoader)
             for key,value in content.items():
@@ -34,13 +39,12 @@ class Logger(Module):
         if self.Print:
             print(message)
         if self.Log:
-            pass
+            self.logger.debug(f"{message}")
 
     def run(self):
         pass
 
 
 if __name__ == "__main__":
-    Logger = Logger(Print = True, Topics = "gamepad,command")
-
+    Logger = Logger(Print = False, Log = True, Topics = "gamepad,command")
     pub.sendMessage("gamepad.sdfs", message = {"Ricky": "dehydrtion"})

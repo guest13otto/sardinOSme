@@ -44,7 +44,7 @@ if __name__ == "__main__":
     EM1.start(1)
     EM2.start(1)
     Gamepad = Gamepad()
-    Gamepad.start(10)
+    #Gamepad.start(10)
     __Test_Case_Send__ = __Test_Case_Send__()
     __Test_Case_Send__.start(1)
     AsyncModuleManager = AsyncModuleManager()
