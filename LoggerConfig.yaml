@@ -5,7 +5,7 @@ formatters:
 handlers:
   console:
     class: logging.StreamHandler
-    level: DEBUG
+    level: WARNING
     formatter: simple
     stream: ext://sys.stdout
   file_handler:
@@ -14,13 +14,17 @@ handlers:
     formatter: simple
     filename: console.log
     encoding: utf8
-    mode: w
+    mode: a
 loggers:
-  simpleExample:
+  Logger:
     level: DEBUG
-    handlers: [file_handler]
+    handlers: [file_handler, console]
+    propagate: no
+  Printer:
+    level: DEBUG
+    handlers: [console]
     propagate: no
 root:
   level: DEBUG
-  handlers: [file_handler]
+  handlers: [file_handler, console]
   propagate: no

@@ -17,7 +17,8 @@ class Logger(Module):
         with open('LoggerConfig.yaml', 'rt') as f:
             config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
-        self.logger = logging.getLogger('simple')
+        self.logger = logging.getLogger('Logger')
+        self.printer = logging.getLogger('Printer')
         #logging.basicConfig(filename='console.log', filemode='w', level = logging.DEBUG, format='%(levelname)s - %(message)s')
         '''try:
             content = yaml.load(open('config.yaml', 'r'), Loader = yaml.FullLoader)
@@ -37,14 +38,14 @@ class Logger(Module):
 
     def message_listener(self, message):
         if self.Print:
-            print(message)
+            exec("self.printer.debug(f'{message}')")
         if self.Log:
-            self.logger.debug(f"{message}")
+            exec("self.logger.debug(f'{message}')")
 
     def run(self):
         pass
 
 
 if __name__ == "__main__":
-    Logger = Logger(Print = False, Log = True, Topics = "gamepad,command")
+    Logger = Logger(Print = True, Log = True, Topics = "gamepad,command")
     pub.sendMessage("gamepad.sdfs", message = {"Ricky": "dehydrtion"})
