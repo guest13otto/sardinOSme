@@ -37,10 +37,18 @@ class Logger(Module):
             exec(f'pub.subscribe(self.message_listener, "{topic}")')
 
     def message_listener(self, message):
+        item = message.get("logLevel")
+        #print(item)
         if self.Print:
-            exec("self.printer.debug(f'{message}')")
+            try:
+                exec(f"self.printer.{item}({message})")
+            except KeyError:
+                exec(f"self.printer.debug({message})")
         if self.Log:
-            exec("self.logger.debug(f'{message}')")
+            try:
+                exec(f"self.logger.{item}({message})")
+            except KeyError:
+                exec(f"self.printer.debug({message})")
 
     def run(self):
         pass
@@ -48,4 +56,4 @@ class Logger(Module):
 
 if __name__ == "__main__":
     Logger = Logger(Print = True, Log = True, Topics = "gamepad,command")
-    pub.sendMessage("gamepad.sdfs", message = {"Ricky": "dehydrtion"})
+    pub.sendMessage("gamepad.sdfs", message = {"logLevel": "warning","Ricky": "dehydrtion"})

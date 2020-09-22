@@ -3,22 +3,27 @@ formatters:
   simple:
     format: '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 handlers:
-  console:
+  Logger_console:
     class: logging.StreamHandler
     level: WARNING
     formatter: simple
     stream: ext://sys.stdout
-  file_handler:
+  Logger_file:
     class: logging.FileHandler
     level: DEBUG
     formatter: simple
     filename: console.log
     encoding: utf8
-    mode: a
+    mode: w
+  console:
+    class: logging.StreamHandler
+    level: DEBUG
+    formatter: simple
+    stream: ext://sys.stdout
 loggers:
   Logger:
     level: DEBUG
-    handlers: [file_handler, console]
+    handlers: [Logger_file, Logger_console]
     propagate: no
   Printer:
     level: DEBUG
@@ -26,5 +31,5 @@ loggers:
     propagate: no
 root:
   level: DEBUG
-  handlers: [file_handler, console]
+  handlers: [Logger_file, console]
   propagate: no
