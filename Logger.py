@@ -12,6 +12,25 @@ AllTopics = {"Gamepad": 'gamepad',
              }
 
 class Logger(Module):
+
+    def Factory(self):
+        def innerListener(message):
+            item = message.get("logLevel")
+            print("in listener")
+            if self.Print:
+                print("in print")
+                try:
+                    exec(f"self.printer.{item}({message})")
+                except KeyError:
+                    exec(f"self.printer.debug({message})")
+            if self.Log:
+                try:
+                    exec(f"self.logger.{item}({message})")
+                except KeyError:
+                    exec(f"self.printer.debug({message})")
+
+        return innerListener
+
     def __init__(self, Print, Log, Topics):
         super().__init__()
         with open('LoggerConfig.yaml', 'rt') as f:
@@ -19,7 +38,6 @@ class Logger(Module):
             logging.config.dictConfig(config)
         self.logger = logging.getLogger('Logger')
         self.printer = logging.getLogger('Printer')
-        #logging.basicConfig(filename='console.log', filemode='w', level = logging.DEBUG, format='%(levelname)s - %(message)s')
         '''try:
             content = yaml.load(open('config.yaml', 'r'), Loader = yaml.FullLoader)
             for key,value in content.items():
@@ -33,27 +51,13 @@ class Logger(Module):
         self.Topics = tuple(map(str, Topics.split(',')))
         #print(self.Topics)
         for topic in self.Topics:
-            #print(topic)
-            exec(f'pub.subscribe(self.message_listener, "{topic}")')
-
-    def message_listener(self, message):
-        item = message.get("logLevel")
-        #print(item)
-        if self.Print:
-            try:
-                exec(f"self.printer.{item}({message})")
-            except KeyError:
-                exec(f"self.printer.debug({message})")
-        if self.Log:
-            try:
-                exec(f"self.logger.{item}({message})")
-            except KeyError:
-                exec(f"self.printer.debug({message})")
+            exec(f"{topic}_listener = self.Factory()")
+            exec(f'pub.subscribe({topic}_listener, "{topic}")')
 
     def run(self):
         pass
 
 
 if __name__ == "__main__":
-    Logger = Logger(Print = True, Log = True, Topics = "gamepad,command")
+    Logger = Logger(Print = True, Log = False, Topics = "gamepad,command")
     pub.sendMessage("gamepad.sdfs", message = {"logLevel": "warning","Ricky": "dehydrtion"})
