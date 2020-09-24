@@ -13,22 +13,13 @@ AllTopics = {"Gamepad": 'gamepad',
 
 class Logger(Module):
 
-    def Factory(self):
+    def Factory(self, topic):
         def innerListener(message):
-            item = message.get("logLevel")
-            print("in listener")
-            if self.Print:
-                print("in print")
-                try:
-                    exec(f"self.printer.{item}({message})")
-                except KeyError:
-                    exec(f"self.printer.debug({message})")
-            if self.Log:
-                try:
-                    exec(f"self.logger.{item}({message})")
-                except KeyError:
-                    exec(f"self.printer.debug({message})")
-
+            level = message.get("logLevel")
+            try:
+                print(f"self.{topic}.{level}({message})")
+            except KeyError:
+                exec(f"self.{topic}.debug({message})")
         return innerListener
 
     def __init__(self, Print, Log, Topics):
@@ -36,22 +27,27 @@ class Logger(Module):
         with open('LoggerConfig.yaml', 'rt') as f:
             config = yaml.safe_load(f.read())
             logging.config.dictConfig(config)
-        self.logger = logging.getLogger('Logger')
-        self.printer = logging.getLogger('Printer')
-        '''try:
-            content = yaml.load(open('config.yaml', 'r'), Loader = yaml.FullLoader)
-            for key,value in content.items():
-                for key, value in value.items():
-                    if key == 'varclass':
-                        Topics.append(value)
-        except FileNotFoundError:
-            pass'''
+        #self.logger = logging.getLogger('Logger')
+        #self.printer = logging.getLogger('Printer')
         self.Print = Print
         self.Log = Log
         self.Topics = tuple(map(str, Topics.split(',')))
         #print(self.Topics)
+
         for topic in self.Topics:
-            exec(f"{topic}_listener = self.Factory()")
+            exec(f"self.{topic} = logging.getLogger('{topic}')")
+
+            if self.Print:
+                #https://stackoverflow.com/questions/6333916/python-logging-ensure-a-handler-is-added-only-once
+                exec(f"self.{topic}.addHandler(logging.console)")
+            elif self.Log and not self.Print:
+                exec(f"self.{topic}.addHandler(Logger_file, Logger_console)")
+            elif self.Log and self.file:
+                exec(f"self.{topic}.addHandler(Logger_file, console)")
+            else:
+                pass
+
+            exec(f"{topic}_listener = self.Factory({topic})")
             exec(f'pub.subscribe({topic}_listener, "{topic}")')
 
     def run(self):

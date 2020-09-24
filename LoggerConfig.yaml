@@ -25,10 +25,6 @@ loggers:
     level: DEBUG
     handlers: [Logger_file, Logger_console]
     propagate: no
-  Printer:
-    level: DEBUG
-    handlers: [console]
-    propagate: no
 root:
   level: DEBUG
   handlers: [Logger_file, console]
