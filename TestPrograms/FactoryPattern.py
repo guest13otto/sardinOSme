@@ -1,19 +1,14 @@
-class Factory:
-
-    def Factory(self):
-        def listener(message):
-            if message == "True":
-                print("True")
-                self.message = message
-            else:
-                print("False")
-        return listener
-
-    def function(self):
-        function = self.Factory()
-        function("True")
+def Factory(topic):
+  def innerListener(message):
+    print("in listener")
+    level = message.get("logLevel")
+    if level:
+        print(f"{topic}.{level}({message})")
+    else:
+        exec(f"{topic}.debug({message})")
+  return innerListener
 
 
 if __name__ == "__main__":
-    Factory = Factory()
-    Factory.function()
+  gamepad_listener = Factory("gamepad")
+  gamepad_listener(message = {"log=level": 'debug'})
