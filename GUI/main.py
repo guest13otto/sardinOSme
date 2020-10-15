@@ -3,7 +3,7 @@ import pygame
 from plot import Plot
 from pubsub import pub
 import random
-from popup import ProfilePopup
+from popup import ProfilePopup, EM1Popup
 
 # import from parent directory
 currentdir = os.path.dirname(os.path.realpath(__file__))
@@ -29,6 +29,7 @@ class GUI(Module):
 
         self.widgets = []
         self.widgets.append((ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
+        self.widgets.append((EM1Popup(self.screen_width, self.screen_height), (0, 0)))
 
         self.charts = []
         self.charts.append((Plot(['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
@@ -84,6 +85,10 @@ class TestCaseSend(Module):
     def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
         pub.sendMessage('Thruster.Power', message={"Thruster_message": [self.power]})
+
+    @Module.loop(0.002)
+    def run4(self):
+        pub.sendMessage('gamepad.EM1', message={"EM_L": random.randint(0, 1), "EM_R": random.randint(0, 1)})
 
 
 if __name__ == "__main__":
