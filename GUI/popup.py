@@ -54,8 +54,8 @@ class ProfilePopup:
         return self.surface
 
 
-class EM1Popup:
-    def __init__(self, screen_width, screen_height):
+class EMPopup:
+    def __init__(self, screen_width, screen_height, order):
         super().__init__()
         self.screen_width = screen_width
         self.screen_height = screen_height
@@ -67,13 +67,14 @@ class EM1Popup:
         self.emR = -1
         self.labels = ['OFF', 'ON']
         self.font = pygame.font.SysFont("Courier New", 16)
-        pub.subscribe(self.em1_handler, "gamepad.EM1")
+        pub.subscribe(self.em_handler, "gamepad.EM{}".format(order))
+        self.order = order
         self.expired = time.time()
 
-    def em1_handler(self, message):
-        self.set_em1(message["EM_L"], message["EM_R"])
+    def em_handler(self, message):
+        self.set_em(message["EM_L"], message["EM_R"])
 
-    def set_em1(self, emL, emR):
+    def set_em(self, emL, emR):
         if emL != self.emL or emR != self.emR:
             self.emL = emL
             self.emR = emR
@@ -83,8 +84,8 @@ class EM1Popup:
         purple = (124, 121, 162)
         if self.expired > time.time():
             self.surface.fill((1, 1, 1))
-            em1Surf = pygame.Surface((self.x, self.y))
-            em1Surf.fill(purple)
+            emSurf = pygame.Surface((self.x, self.y))
+            emSurf.fill(purple)
 
             textSurfL = self.font.render('EM_L: ' + self.labels[self.emL], True, (0, 0, 0))
             textRectL = textSurfL.get_rect()
@@ -94,12 +95,12 @@ class EM1Popup:
             textRectR = textSurfR.get_rect()
             textRectR.center = (self.x / 2, self.y / 2 + 10)
 
-            em1Surf.blit(textSurfL, textRectL)
-            em1Surf.blit(textSurfR, textRectR)
-            self.surface.blit(em1Surf, (self.screen_width-self.x, self.screen_height-self.y))
+            emSurf.blit(textSurfL, textRectL)
+            emSurf.blit(textSurfR, textRectR)
+            self.surface.blit(emSurf, ((self.order-1)*(self.screen_width-self.x), self.screen_height-self.y))
         else:
             self.surface.fill((1, 1, 1))
-            label = Label(self.screen_width, self.screen_height, (1, 1), 14, bgColour=purple)
+            label = Label(self.screen_width, self.screen_height, (1, self.order-1), 14, bgColour=purple)
             text = 'EM_L: ' + self.labels[self.emL] + ' EM_R: ' + self.labels[self.emR]
             self.surface.blit(label.update(text), (0, 0))
         return self.surface
