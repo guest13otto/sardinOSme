@@ -89,7 +89,6 @@ class TestCaseSend(Module):
 
     @Module.loop(0.002)
     def run4(self):
-        print('change EM')
         pub.sendMessage('gamepad.EM{}'.format(random.randint(1, 2)), message={"EM_L": random.randint(0, 1), "EM_R": random.randint(0, 1)})
 
 

@@ -12,8 +12,8 @@ class Plot:
         self.screen_height = screen_height
         self.screen = pygame.Surface((self.screen_width, self.screen_height))
         self.xliftoff = 50
-        self.yliftoff = 30
-        self.bar_width = 20
+        self.yliftoff = 50
+        self.bar_width = 17
         self.labels = labels
         self.axes = Axis(self.screen, self.screen_width, self.screen_height, self.xliftoff, self.yliftoff, self.bar_width)
         self.movement = 0
