@@ -13,7 +13,7 @@ class ProfilePopup:
         self.surface.set_colorkey((1, 1, 1))
         self.x = 100
         self.y = 75
-        self.profile = -1
+        self.profile = 0
         teal = (108, 194, 189)
         blue = (90, 128, 158)
         purple = (124, 121, 162)
@@ -63,8 +63,8 @@ class EMPopup:
         self.surface.set_colorkey((1, 1, 1))
         self.x = 100
         self.y = 75
-        self.emL = -1
-        self.emR = -1
+        self.emL = 0
+        self.emR = 0
         self.labels = ['OFF', 'ON']
         self.font = pygame.font.SysFont("Courier New", 16)
         pub.subscribe(self.em_handler, "gamepad.EM{}".format(order))
@@ -91,7 +91,7 @@ class EMPopup:
             textRectL = textSurfL.get_rect()
             textRectL.center = (self.x / 2, self.y / 2 - 10)
 
-            textSurfR = self.font.render('EM_L: ' + self.labels[self.emL], True, (0, 0, 0))
+            textSurfR = self.font.render('EM_R: ' + self.labels[self.emR], True, (0, 0, 0))
             textRectR = textSurfR.get_rect()
             textRectR.center = (self.x / 2, self.y / 2 + 10)
 
