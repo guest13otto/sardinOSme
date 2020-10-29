@@ -51,13 +51,13 @@ EM2:
   varclass: EM
   frequency: 1
   address: 0x32
-Logger:
-  file: Logger
-  varclass: Logger
-  frequency: 1
-  Print: True
-  Log: True
-  Topics: "gamepad.profile" #All Topicss: gamepad, command, Thruster, info, can, log
+#Logger:
+#  file: Logger
+#  varclass: Logger
+#  frequency: 1
+#  Print: True
+#  Log: True
+#  Topics: "Thruster" #All Topicss: gamepad, command, Thruster, info, can, log
 CAN_Handler:
   file: CAN_Handler
   varclass: CAN_Handler

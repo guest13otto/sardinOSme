@@ -1,7 +1,6 @@
 
 CG: 0,0,0
-rate: 1.5
-ThrusterFL:
+rate: ThrusterFL:
   Name: ThrusterFL
   Address: 0x14
   Invert: True
