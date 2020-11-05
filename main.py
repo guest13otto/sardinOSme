@@ -1,15 +1,17 @@
 import sys, os, inspect
 import pygame
-from plot import Plot
 from pubsub import pub
 import random
-from popup import ProfilePopup, EMPopup
 
 # import from parent directory
 currentdir = os.path.dirname(os.path.realpath(__file__))
 parentdir = os.path.dirname(currentdir)
 sys.path.insert(0, parentdir)
 from Module_Base_Async import Module, AsyncModuleManager
+
+sys.path.insert(1, './GUI')
+from plot import Plot
+from popup import ProfilePopup, EMPopup
 
 
 class GUI(Module):
