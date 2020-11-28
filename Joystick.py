@@ -137,13 +137,17 @@ class Joystick(Module):
 
     @Module.loop(1)
     def run_mapping(self):
-        LLR, LUD, BLR, RLR, RUD, _ = self.direct_input
+        LLR, LUD, BL, RLR, RUD, BR = self.direct_input
         LLR = -1*deadzoneleft(LLR)
         LUD = -1*deadzoneleft(LUD)
-        BLR = -1*deadzone_back(BLR)
-        RLR = -1*deadzoneright(RLR)
+        BL = -((BL+1)/2)
+        BR = (BR+1)/2
+        #print(BL)
+        BLR = BL+BR
+        #print(BLR)
+        RLR = deadzoneright(RLR)
         RUD = -1*deadzoneright(RUD)
-        new_movement_message = [LLR, LUD, RUD, BLR, RLR, 0]
+        new_movement_message = [RLR, LUD, LLR, RUD, BLR, 0]
         if new_movement_message != self.movement_message:
             self.movement_message = new_movement_message[:]
         pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
@@ -197,7 +201,7 @@ if __name__ == "__main__":
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
     joystick = Joystick()
     joystick.start(50)
-    #pub.subscribe(debug_listener_movement, 'gamepad.movement')
+    pub.subscribe(debug_listener_movement, 'gamepad.movement')
     pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
     pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')

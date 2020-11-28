@@ -73,7 +73,7 @@ class Thrusters(Module):
                 else:
                     self.output_power[counter] = int(self.output_power[counter]*32768)
 
-                #pub.sendMessage("can.send", message = {"address": self.Thrusters[counter]["Address"], "data": [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff]})
+                pub.sendMessage("can.send", message = {"address": self.Thrusters[counter]["Address"], "data": [32, self.output_power[counter] >> 8 & 0xff, self.output_power[counter] & 0xff]})
         #print(f"difference: {self.difference}")
         #print(f"current_power: {self.current_power}")
         #print(f"output_power: {self.output_power}")

@@ -1,12 +1,12 @@
 Subfolders: [GUI]
-Gamepad:
-  file: Gamepad
-  varclass: Gamepad
-  frequency: 100
-# Joystick:
-#   file: Pygame_Joystick
-#   varclass: Pygame_Joystick
-#   frequency: 100
+# Gamepad:
+#  file: Gamepad
+#  varclass: Gamepad
+#  frequency: 100
+Joystick:
+   file: Joystick
+   varclass: Joystick
+   frequency: 100
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile
