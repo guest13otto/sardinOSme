@@ -113,9 +113,9 @@ class Gamepad(Module):
                     self.updown1 =  (-1)*normalize(event.state, Normalize_Constant_Z)
                 if (analogcode == "ABS_RZ"):
                     self.updown2 = normalize(event.state, Normalize_Constant_Z)
-
+                #if (analogcode[:4] == "ABS_" and analogcode[-1] == "Z"):
                 self.updown = half_movement_value_join(self.updown1, self.updown2)
-
+                #print(self.strafe, self.drive, self.tilt, self.yaw, self.updown)
 
                 if self.control_invert == False:#tfront, tback
                     self.movement_message = (-self.strafe, self.drive, self.yaw, self.updown, -self.tilt, 0)

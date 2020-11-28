@@ -1,9 +1,12 @@
-<<<<<<< HEAD
 Subfolders: [GUI]
 Gamepad:
   file: Gamepad
   varclass: Gamepad
   frequency: 100
+# Joystick:
+#   file: Pygame_Joystick
+#   varclass: Pygame_Joystick
+#   frequency: 100
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile
@@ -67,28 +70,26 @@ GUI:
   file: main
   varclass: GUI
   frequency: 30
-=======
 # pubsender:
 #    file: pubsender
 #    varclass: pubsender
 #    frequency: 1
-cpub:
-   file: socketpubsub
-   varclass: cpub
-   ip: 192.168.3.15
-   port: 8080
-   config_file: serverconfig.yaml
-   frequency: 1
-pubsender2:
-    file: pubsender
-    varclass: pubsender2
-    frequency: 1
-pubreceiver:
-    file: pubsender
-    varclass: pubreceiver
-    frequency: 1
+# cpub:
+#   file: socketpubsub
+#   varclass: cpub
+#   ip: 192.168.3.15
+#   port: 8080
+#   config_file: serverconfig.yaml
+#   frequency: 1
+# pubsender2:
+#    file: pubsender
+#    varclass: pubsender2
+#    frequency: 1
+# pubreceiver:
+#    file: pubsender
+#    varclass: pubreceiver
+#    frequency: 1
 # spub:
 #    file: socketpubsub
 #    varclass: spub
 #    frequency: 1
->>>>>>> 108015d24eb36bb98432e98d33fc81f4e71dc640
