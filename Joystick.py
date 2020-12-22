@@ -132,17 +132,15 @@ class Joystick(Module):
             new_movement_message = [LLR, LUD, RLR, BLR, RUD, 0]
 
         if self.system == "Linux":
-            LLR, LUD, BL, RUD, RLR, BR = self.direct_input
-            LLR = -1*deadzoneleft(LLR)
+            LLR, LUD, BL, RLR, RUD, BR = self.direct_input
+            LLR = 1*deadzoneleft(LLR)
             LUD = -1*deadzoneleft(LUD)   #0, 0.5 -> -1, 0 (-0.5, x2)           0.5, 1 -> 0, 1  (-0.5, x2)
-            BL = -((BL+1)/2)             
-            BR = (BR+1)/2
-            #print(BL)
-            BLR = BL+BR
-            #print(BLR)
-            RLR = deadzoneright(RLR)
+            BL = -((BL+1)/2)  
+            RLR = 1*deadzoneright(RLR)          
             RUD = -1*deadzoneright(RUD)
-            new_movement_message = [RLR, LUD, LLR, RUD, BLR, 0]   #(strafe, drive, yaw, updown, tilt, 0)
+            BR = (BR+1)/2
+            BLR = deadzone_back(BL+BR)
+            new_movement_message = [LLR, LUD, RLR, BLR, RUD, 0]   #(strafe, drive, yaw, updown, tilt, 0)
 
         if new_movement_message != self.movement_message:
             self.movement_message = new_movement_message[:]
