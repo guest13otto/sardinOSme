@@ -100,7 +100,7 @@ class Joystick(Module):
         pygame.event.pump()
         for i in range(self.joystick.get_numaxes()):
             self.direct_input[i] = self.joystick.get_axis(i)
-            #print(self.direct_input)
+            print(self.direct_input)
 
     
     @Module.loop(1)
@@ -197,7 +197,7 @@ if __name__ == "__main__":
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
     joystick = Joystick()
     joystick.start(50)
-    pub.subscribe(debug_listener_movement, 'gamepad.movement')
+    #pub.subscribe(debug_listener_movement, 'gamepad.movement')
     #pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
     #pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
