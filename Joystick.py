@@ -100,7 +100,7 @@ class Joystick(Module):
         pygame.event.pump()
         for i in range(self.joystick.get_numaxes()):
             self.direct_input[i] = self.joystick.get_axis(i)
-            print(self.direct_input)
+            #print(self.direct_input)
 
     
     @Module.loop(1)
@@ -133,15 +133,17 @@ class Joystick(Module):
 
         if self.system == "Linux":
             LLR, LUD, BL, RLR, RUD, BR = self.direct_input
+            #print(BL, BR)
             LLR = 1*deadzoneleft(LLR)
-            LUD = -1*deadzoneleft(LUD)   #0, 0.5 -> -1, 0 (-0.5, x2)           0.5, 1 -> 0, 1  (-0.5, x2)
+            LUD = 1*deadzoneleft(LUD)   #0, 0.5 -> -1, 0 (-0.5, x2)           0.5, 1 -> 0, 1  (-0.5, x2)
             BL = -((BL+1)/2)  
             RLR = 1*deadzoneright(RLR)          
             RUD = -1*deadzoneright(RUD)
             BR = (BR+1)/2
             BLR = deadzone_back(BL+BR)
             new_movement_message = [LLR, LUD, RLR, BLR, RUD, 0]   #(strafe, drive, yaw, updown, tilt, 0)
-
+        #print(new_movement_message)
+        #print(BL, BR)
         if new_movement_message != self.movement_message:
             self.movement_message = new_movement_message[:]
         pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
@@ -195,7 +197,7 @@ if __name__ == "__main__":
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
     joystick = Joystick()
     joystick.start(50)
-    #pub.subscribe(debug_listener_movement, 'gamepad.movement')
+    pub.subscribe(debug_listener_movement, 'gamepad.movement')
     #pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
     #pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')

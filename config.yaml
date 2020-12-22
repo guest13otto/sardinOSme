@@ -1,12 +1,12 @@
 Subfolders: [GUI]
-#Gamepad:
+# Gamepad:
 #  file: Gamepad
 #  varclass: Gamepad
 #  frequency: 100
 Joystick:
-   file: Joystick
-   varclass: Joystick
-   frequency: 100
+  file: Joystick
+  varclass: Joystick
+  frequency: 100
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile

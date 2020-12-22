@@ -4,7 +4,7 @@ rate: 1.5
 ThrusterFL:
   Name: ThrusterFL
   Address: 0x13
-  Invert: True
+  Invert: False
   Position: -0.168,0.176,0 # x, y, z metre
   Direction: 0.707,0.707,0 # x, y, z magnitude
   Scale: 3
@@ -14,7 +14,7 @@ ThrusterFL:
 ThrusterFR:
   Name: ThrusterFR
   Address: 0x1C
-  Invert: True
+  Invert: False
   Position: 0.168,0.176,0
   Direction: -0.707,0.707,0
   Scale: 3
@@ -23,7 +23,7 @@ ThrusterFR:
   Deadzone: 0.1
 ThrusterBL:
   Name: ThrusterBL
-  Address: 0x16
+  Address: 0x14
   Invert: True
   Position: -0.168,-0.176,0
   Direction: 0.707,-0.707,0
@@ -33,7 +33,7 @@ ThrusterBL:
   Deadzone: 0.1
 ThrusterBR:
   Name: ThrusterBR
-  Address: 0x14
+  Address: 0x16
   Invert: False
   Position: 0.168,-0.176,0
   Direction: -0.707,-0.707,0
@@ -54,7 +54,7 @@ ThrusterUF:
 ThrusterUB:
   Name: ThrusterUB
   Address: 0x1D
-  Invert: False
+  Invert: True
   Position: 0,-0.182,0.097
   Direction: 0,0,1
   Scale: 2.65
