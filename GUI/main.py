@@ -32,7 +32,7 @@ class GUI(Module):
         self.widgets.append((EMPopup(self.screen_width, self.screen_height, 2), (0, 0)))
 
         self.charts = []
-        self.charts.append((Plot(['strafe', 'drive', 'yaw', 'tilt', 'ud', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
+        self.charts.append((Plot(['strafe', 'drive', 'yaw', 'ud', 'tilt', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
         self.charts.append((Plot(['FL', 'FR', 'BL', 'BR', 'TL', 'TR'], self.screen_width, self.screen_height), (self.screen_width/2, 0), 1))
 
     def run(self):
