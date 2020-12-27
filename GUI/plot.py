@@ -2,6 +2,7 @@ import pygame
 import numpy as np
 from axis import Axis
 from bar import Bar
+from profile import Profile
 from pubsub import pub
 
 

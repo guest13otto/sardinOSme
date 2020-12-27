@@ -15,7 +15,7 @@ class Loader():
                     for folder in content[nodeName]:
                         currentdir = os.path.dirname(os.path.realpath(__file__))
                         sys.path.insert(0, os.path.join(currentdir, f"{folder}"))
-                        print(f"{currentdir}\{folder} inserted to sys.path") 
+                        print(f"{currentdir}/{folder} inserted to sys.path") 
                     continue
                 args = ''
                 moduleName = content[nodeName]

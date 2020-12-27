@@ -22,8 +22,9 @@ class EM(Module):
         pass
 
     def Listener(self, message):
+        #print(message)
         pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand[str(list(message.keys())[0])][list(message.values())[0]]})
-        #pub.sendMessage("can.send", message = {"address": eval(self.address), "data": [0x31, 0x10]})
+        pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand[str(list(message.keys())[1])][list(message.values())[1]]})
 
 class __Test_Case_Send__(Module):
     def __init__(self):

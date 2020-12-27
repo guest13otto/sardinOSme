@@ -131,6 +131,7 @@ class Thruster_Power(Module):
         finalList = finalList.reshape(1,6)
         finalList = finalList.tolist()
         finalList = [item for item in finalList if isinstance(item,list)]
+        print(finalList)
         pub.sendMessage("Thruster.Power", message = {"Thruster_message": finalList})
 
     @Module.asyncloop(1)

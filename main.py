@@ -4,9 +4,9 @@ from pubsub import pub
 import random
 
 # import from parent directory
-currentdir = os.path.dirname(os.path.realpath(__file__))
-parentdir = os.path.dirname(currentdir)
-sys.path.insert(0, parentdir)
+#currentdir = os.path.dirname(os.path.realpath(__file__))
+#parentdir = os.path.dirname(currentdir)
+#sys.path.insert(0, parentdir)
 from Module_Base_Async import Module, AsyncModuleManager
 
 sys.path.insert(1, './GUI')

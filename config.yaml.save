@@ -1,12 +1,11 @@
 Subfolders: [GUI]
-# Gamepad:
-#  file: Gamepad
-#  varclass: Gamepad
-#  frequency: 100
-Joystick:
-  file: Joystick
-  varclass: Joystick
+Gamepad:
+  file: Gamepad
+  varclass: Gamepad
   frequency: 100
+ Joystick:
+   file: Pygame_Joystick
+   varclass: Pygame_Joystick   frequency: 100
 ProfileA:
   file: ControlProfile
   varclass: ControlProfile
@@ -48,7 +47,7 @@ EM1:
   file: EM
   varclass: EM
   frequency: 1
-  address: 0x31
+  address: 0x30
 EM2:
   name: EM2
   file: EM
