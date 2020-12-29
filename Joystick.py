@@ -77,6 +77,7 @@ class Joystick(Module):
         self.rb_input = [0, 0]
         self.back_input = [0, 0]
         self.start_input = [0, 0]
+        self.guide_input = [0, 0]
         self.l_stick_input = [0, 0]
         self.r_stick_input = [0, 0]
         self.west_input = [0, 0]
@@ -105,20 +106,38 @@ class Joystick(Module):
     
     @Module.loop(1)
     def run_get_buttons(self):
-        self.a_input = [self.a_input[0],self.joystick.get_button(0)]
-        self.b_input = [self.b_input[0],self.joystick.get_button(1)]
-        self.x_input = [self.x_input[0],self.joystick.get_button(2)]
-        self.y_input = [self.y_input[0],self.joystick.get_button(3)]
-        self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
-        self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
-        self.back_input = [self.back_input[0],self.joystick.get_button(6)]
-        self.start_input = [self.start_input[0],self.joystick.get_button(7)]
-        self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(8)]
-        self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(9)]
-        self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
-        self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
-        self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
-        self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
+        if self.system == "Windows":
+            self.a_input = [self.a_input[0],self.joystick.get_button(0)]
+            self.b_input = [self.b_input[0],self.joystick.get_button(1)]
+            self.x_input = [self.x_input[0],self.joystick.get_button(2)]
+            self.y_input = [self.y_input[0],self.joystick.get_button(3)]
+            self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
+            self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
+            self.back_input = [self.back_input[0],self.joystick.get_button(6)]
+            self.start_input = [self.start_input[0],self.joystick.get_button(7)]
+            self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(8)]
+            self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(9)]
+            self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
+            self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
+            self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
+            self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
+        if self.system == "Linux":
+            self.a_input = [self.a_input[0],self.joystick.get_button(0)]
+            self.b_input = [self.b_input[0],self.joystick.get_button(1)]
+            self.x_input = [self.x_input[0],self.joystick.get_button(2)]
+            self.y_input = [self.y_input[0],self.joystick.get_button(3)]
+            self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
+            self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
+            self.back_input = [self.back_input[0],self.joystick.get_button(6)]
+            self.start_input = [self.start_input[0],self.joystick.get_button(7)]
+            self.guide_input = [self.guide_input[0],self.joystick.get_button(8)]
+            self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(9)]
+            self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(10)]
+            self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
+            self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
+            self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
+            self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
+
 
     @Module.loop(1)
     def run_mapping(self):
@@ -129,21 +148,22 @@ class Joystick(Module):
             RLR = 1*deadzoneright(RLR)
             RUD = -1*deadzoneright(RUD)
             BLR = -1*deadzone_back(BLR)
-            new_movement_message = [LLR, LUD, RLR, BLR, RUD, 0]
 
         if self.system == "Linux":
             LLR, LUD, BL, RLR, RUD, BR = self.direct_input
-            #print(BL, BR)
             LLR = 1*deadzoneleft(LLR)
-            LUD = 1*deadzoneleft(LUD)   #0, 0.5 -> -1, 0 (-0.5, x2)           0.5, 1 -> 0, 1  (-0.5, x2)
+            LUD = -1*deadzoneleft(LUD)   
             BL = -((BL+1)/2)  
             RLR = 1*deadzoneright(RLR)          
             RUD = -1*deadzoneright(RUD)
             BR = (BR+1)/2
             BLR = deadzone_back(BL+BR)
-            new_movement_message = [LLR, LUD, RLR, BLR, RUD, 0]   #(strafe, drive, yaw, updown, tilt, 0)
-        #print(new_movement_message)
-        #print(BL, BR)
+        
+        if self.control_invert:
+            new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
+        else:
+            new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]   
+
         if new_movement_message != self.movement_message:
             self.movement_message = new_movement_message[:]
         pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
