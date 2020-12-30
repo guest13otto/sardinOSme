@@ -9,7 +9,7 @@ class ProfilePopup:
         super().__init__()
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.surface = pygame.Surface((400, 300))
+        self.surface = pygame.Surface((screen_width, screen_height))
         self.surface.set_colorkey((1, 1, 1))
         self.x = 100
         self.y = 75
@@ -59,7 +59,7 @@ class EMPopup:
         super().__init__()
         self.screen_width = screen_width
         self.screen_height = screen_height
-        self.surface = pygame.Surface((400, 300))
+        self.surface = pygame.Surface((screen_width, screen_height))
         self.surface.set_colorkey((1, 1, 1))
         self.x = 100
         self.y = 75
@@ -106,4 +106,52 @@ class EMPopup:
             label = Label(self.screen_width, self.screen_height, (1, self.order-1), 14, bgColour=self.colour)
             text = 'EM_L: ' + self.labels[self.emL] + ' EM_R: ' + self.labels[self.emR]
             self.surface.blit(label.update(text), (0, 0))
+        return self.surface
+
+
+class InvertPopup:
+    def __init__(self, screen_width, screen_height):
+        super().__init__()
+        self.screen_width = screen_width
+        self.screen_height = screen_height
+        self.surface = pygame.Surface((screen_width, screen_height))
+        self.surface.set_colorkey((1, 1, 1))
+        self.x = 100
+        self.y = 75
+        self.invert = 0
+        red = (255, 0, 0)
+        green = (0, 255, 0)
+        self.colours = [green, red]
+        self.iArr = ['OFF', 'ON']
+        self.labels = ['Invert: ' + self.iArr[i] for i in range(2)]
+        self.font = pygame.font.SysFont("Courier New", 16)
+        pub.subscribe(self.invert_handler, "gamepad.invert")
+        self.expired = time.time()
+
+    def invert_handler(self, message):
+        self.set_invert(message["invert"])
+
+    def set_invert(self, invert):
+        if bool(self.invert) != invert:
+            self.expired = time.time() + 1
+        if invert:
+            self.invert = 1
+        else:
+            self.invert = 0
+
+    def update(self):
+        if self.expired > time.time():
+            self.surface.fill((1, 1, 1))
+            invertSurf = pygame.Surface((self.x, self.y))
+            invertSurf.fill(self.colours[self.invert])
+
+            textSurf = self.font.render(self.labels[self.invert], True, (0, 0, 0))
+            textRect = textSurf.get_rect()
+            textRect.center = (self.x / 2, self.y / 2)
+            invertSurf.blit(textSurf, textRect)
+            self.surface.blit(invertSurf, (0, 0))
+        else:
+            self.surface.fill((1, 1, 1))
+            label = Label(self.screen_width, self.screen_height, (0, 0), 14, bgColour=self.colours[self.invert])
+            self.surface.blit(label.update(self.labels[self.invert]), (0, 0))
         return self.surface

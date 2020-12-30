@@ -11,7 +11,7 @@ from Module_Base_Async import Module, AsyncModuleManager
 
 sys.path.insert(1, './GUI')
 from plot import Plot
-from popup import ProfilePopup, EMPopup
+from popup import ProfilePopup, EMPopup, InvertPopup
 
 
 class GUI(Module):
@@ -32,6 +32,7 @@ class GUI(Module):
         self.widgets.append((ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
         self.widgets.append((EMPopup(self.screen_width, self.screen_height, 1), (0, 0)))
         self.widgets.append((EMPopup(self.screen_width, self.screen_height, 2), (0, 0)))
+        self.widgets.append((InvertPopup(self.screen_width, self.screen_height), (0, 0)))
 
         self.charts = []
         self.charts.append((Plot(['strafe', 'drive', 'yaw', 'ud', 'tilt', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
@@ -71,6 +72,7 @@ class TestCaseSend(Module):
         self.movement = 0
         self.profile = -1
         self.power = 0
+        self.invert = False
 
     def run(self):
         self.movement = [random.uniform(-1.0, 1.0) for i in range(5)]
@@ -91,6 +93,13 @@ class TestCaseSend(Module):
     @Module.loop(0.002)
     def run4(self):
         pub.sendMessage('gamepad.EM{}'.format(random.randint(1, 2)), message={"EM_L": random.randint(0, 1), "EM_R": random.randint(0, 1)})
+
+    @Module.loop(0.002)
+    def run5(self):
+        flip = random.randint(0, 1)
+        if flip:
+            self.invert = not self.invert
+        pub.sendMessage('gamepad.invert', message={"invert": self.invert})
 
 
 if __name__ == "__main__":
