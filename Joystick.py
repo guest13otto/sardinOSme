@@ -56,6 +56,12 @@ def button_pressed(button_record):
     button_record[0] = button_record[1]
     return False
 
+def button_hold(joystick_get_button):
+    if joystick_get_button:
+        return True
+    else:
+        return False
+
 class Joystick(Module):
     def __init__(self):
         self.system = platform.system() #Windows or Linux
@@ -69,10 +75,10 @@ class Joystick(Module):
         except:
             raise TypeError("No joystick connected")
         self.joystick.init()
-        self.a_input = [0, 0]
+        self.a_input = 0
         self.b_input = [0, 0]
         self.x_input = [0, 0]
-        self.y_input = [0, 0]
+        self.y_input = 0
         self.lb_input = [0, 0]
         self.rb_input = [0, 0]
         self.back_input = [0, 0]
@@ -94,6 +100,7 @@ class Joystick(Module):
         self.EM2_R = False
         self.show_transectline = False
         self.thumb_profile_cycle = 0
+        self.gripper_default_sent = False
         super().__init__()
 
     @Module.loop(1)
@@ -101,16 +108,15 @@ class Joystick(Module):
         pygame.event.pump()
         for i in range(self.joystick.get_numaxes()):
             self.direct_input[i] = self.joystick.get_axis(i)
-            #print(self.direct_input)
 
     
     @Module.loop(1)
     def run_get_buttons(self):
         if self.system == "Windows":
-            self.a_input = [self.a_input[0],self.joystick.get_button(0)]
+            self.a_input = self.joystick.get_button(0)
             self.b_input = [self.b_input[0],self.joystick.get_button(1)]
             self.x_input = [self.x_input[0],self.joystick.get_button(2)]
-            self.y_input = [self.y_input[0],self.joystick.get_button(3)]
+            self.y_input = self.joystick.get_button(3)
             self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
             self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
             self.back_input = [self.back_input[0],self.joystick.get_button(6)]
@@ -122,10 +128,10 @@ class Joystick(Module):
             self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
             self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
         if self.system == "Linux":
-            self.a_input = [self.a_input[0],self.joystick.get_button(0)]
+            self.a_input = self.joystick.get_button(0)
             self.b_input = [self.b_input[0],self.joystick.get_button(1)]
             self.x_input = [self.x_input[0],self.joystick.get_button(2)]
-            self.y_input = [self.y_input[0],self.joystick.get_button(3)]
+            self.y_input = self.joystick.get_button(3)
             self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
             self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
             self.back_input = [self.back_input[0],self.joystick.get_button(6)]
@@ -193,6 +199,22 @@ class Joystick(Module):
         if button_pressed(self.x_input):
             self.control_invert = not self.control_invert
             pub.sendMessage("gamepad.invert", message = {"invert": self.control_invert}) #For GUI
+        
+        gripper_message = {"extend": False, "retract": False}
+        if button_hold(self.y_input) != button_hold(self.a_input):
+            self.gripper_default_sent = False
+            if button_hold(self.y_input):
+                gripper_message["extend"] = True
+
+            if button_hold(self.a_input):
+                gripper_message["retract"] = True
+            pub.sendMessage("gamepad.gripper", message = gripper_message)
+
+        if not self.gripper_default_sent and gripper_message == {"extend": False, "retract": False}:
+            self.gripper_default_sent = True
+            pub.sendMessage("gamepad.gripper", message = gripper_message)
+        
+        
 
         
 
@@ -213,11 +235,14 @@ if __name__ == "__main__":
         print("EM1: ", message)
     def debug_listener_EM2(message):
         print("EM2: ", message)
+    def debug_listener_gripper(message):
+        print("gripper: ", message)
 
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
     joystick = Joystick()
     joystick.start(50)
-    pub.subscribe(debug_listener_movement, 'gamepad.movement')
+    #pub.subscribe(debug_listener_gripper, "gamepad.gripper")
+    #pub.subscribe(debug_listener_movement, 'gamepad.movement')
     #pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
     #pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
