@@ -55,6 +55,12 @@ EM2:
   varclass: EM
   frequency: 1
   address: 0x32
+Gripper:
+  file: Gripper
+  varclass: Gripper
+  frequency: 1
+  address: 0x21
+  speed: 17000 # 0 - 32767
 #Logger:
 #  file: Logger
 #  varclass: Logger

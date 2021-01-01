@@ -44,11 +44,11 @@ def hat_mapping(hat_tuple):
     if hat_tuple[1]==-1:
         south = 1
     return west, east, north, south
-        
+
 def set_value(var, value):
     if value != None:
         var = value
-        
+
 def button_pressed(button_record):
     if button_record[0]!=button_record[1] and button_record[1]==1:
         button_record[0] = button_record[1]
@@ -109,7 +109,7 @@ class Joystick(Module):
         for i in range(self.joystick.get_numaxes()):
             self.direct_input[i] = self.joystick.get_axis(i)
 
-    
+
     @Module.loop(1)
     def run_get_buttons(self):
         if self.system == "Windows":
@@ -158,17 +158,17 @@ class Joystick(Module):
         if self.system == "Linux":
             LLR, LUD, BL, RLR, RUD, BR = self.direct_input
             LLR = 1*deadzoneleft(LLR)
-            LUD = -1*deadzoneleft(LUD)   
-            BL = -((BL+1)/2)  
-            RLR = 1*deadzoneright(RLR)          
+            LUD = -1*deadzoneleft(LUD)
+            BL = -((BL+1)/2)
+            RLR = 1*deadzoneright(RLR)
             RUD = -1*deadzoneright(RUD)
             BR = (BR+1)/2
             BLR = deadzone_back(BL+BR)
-        
+
         if self.control_invert:
             new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
         else:
-            new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]   
+            new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]
 
         if new_movement_message != self.movement_message:
             self.movement_message = new_movement_message[:]
@@ -199,7 +199,7 @@ class Joystick(Module):
         if button_pressed(self.x_input):
             self.control_invert = not self.control_invert
             pub.sendMessage("gamepad.invert", message = {"invert": self.control_invert}) #For GUI
-        
+
         gripper_message = {"extend": False, "retract": False}
         if button_hold(self.y_input) != button_hold(self.a_input):
             self.gripper_default_sent = False
@@ -213,10 +213,9 @@ class Joystick(Module):
         if not self.gripper_default_sent and gripper_message == {"extend": False, "retract": False}:
             self.gripper_default_sent = True
             pub.sendMessage("gamepad.gripper", message = gripper_message)
-        
-        
 
-        
+
+
 
 
 
@@ -238,16 +237,16 @@ if __name__ == "__main__":
     def debug_listener_gripper(message):
         print("gripper: ", message)
 
-    #pub.subscribe(debug_listener_profile, 'gamepad.profile')
+    pub.subscribe(debug_listener_profile, 'gamepad.profile')
     joystick = Joystick()
     joystick.start(50)
-    #pub.subscribe(debug_listener_gripper, "gamepad.gripper")
+    pub.subscribe(debug_listener_gripper, "gamepad.gripper")
     #pub.subscribe(debug_listener_movement, 'gamepad.movement')
-    #pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
-    #pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
-    #pub.subscribe(debug_listener_profile, 'gamepad.profile')
+    pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
+    pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
+    pub.subscribe(debug_listener_profile, 'gamepad.profile')
     AsyncModuleManager.register_module(joystick)
-    
+
     try:
         AsyncModuleManager.run_forever()
     except KeyboardInterrupt:
