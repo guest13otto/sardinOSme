@@ -25,8 +25,7 @@ can.receive.<arbitration_id>:
 '''
 
 import can
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Module, Async_Task
 from pubsub import pub
 
 class CAN_Handler(Module):
@@ -45,7 +44,7 @@ class CAN_Handler(Module):
         except can.CanError:
             pub.sendMessage("log.error" , message = msg)
 
-    @Module.asyncloop(1)
+    @Async_Task.loop(1)
     async def run(self):
         pass
         '''message = self.bus.recv(1)

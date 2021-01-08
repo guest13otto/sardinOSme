@@ -7,7 +7,7 @@ import random
 #currentdir = os.path.dirname(os.path.realpath(__file__))
 #parentdir = os.path.dirname(currentdir)
 #sys.path.insert(0, parentdir)
-from Module_Base_Async import Module, AsyncModuleManager
+from Module_Base import Module, Async_Task
 
 sys.path.insert(1, './GUI')
 from plot import Plot
@@ -38,7 +38,8 @@ class GUI(Module):
         self.charts.append((Plot(['strafe', 'drive', 'yaw', 'ud', 'tilt', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
         self.charts.append((Plot(['FL', 'FR', 'BL', 'BR', 'TL', 'TR'], self.screen_width, self.screen_height), (self.screen_width/2, 0), 1))
 
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         self.clock.tick(30)
 
         for chart in self.charts:
@@ -74,27 +75,28 @@ class TestCaseSend(Module):
         self.power = 0
         self.invert = False
 
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         self.movement = [random.uniform(-1.0, 1.0) for i in range(5)]
         self.movement.append(0.000)
         pub.sendMessage('gamepad.movement', message={"gamepad_message": self.movement})
 
-    @Module.loop(0.003)
+    @Async_Task.loop(0.003)
     def run2(self):
         pArr = ['A', 'B', 'C', 'D']
         self.profile = pArr[random.randint(0, 3)]
         pub.sendMessage('gamepad.profile', message={"Profile_Dict": self.profile})
 
-    @Module.loop(1)
+    @Async_Task.loop(1)
     def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
         pub.sendMessage('Thruster.Power', message={"Thruster_message": [self.power]})
 
-    @Module.loop(0.002)
+    @Async_Task.loop(0.002)
     def run4(self):
         pub.sendMessage('gamepad.EM{}'.format(random.randint(1, 2)), message={"EM_L": random.randint(0, 1), "EM_R": random.randint(0, 1)})
 
-    @Module.loop(0.002)
+    @Async_Task.loop(0.002)
     def run5(self):
         flip = random.randint(0, 1)
         if flip:

@@ -1,5 +1,5 @@
 from pubsub import pub
-from Module_Base_Async import Module
+from Module_Base import Module, Async_Task
 import pygame
 import platform
 
@@ -63,8 +63,9 @@ def button_hold(joystick_get_button):
         return False
 
 class Joystick(Module):
+    #platform = platform.system()
     def __init__(self):
-        self.system = platform.system() #Windows or Linux
+        #self.system = platform.system() #Windows or Linux
         pygame.init()
         if pygame.display.get_init()==1:
             pygame.display.init()
@@ -91,6 +92,7 @@ class Joystick(Module):
         self.north_input = [0, 0]
         self.south_input = [0, 0]
         self.control_invert = False
+        self.new_movement_message = [0, 0, 0, 0, 0, 0]
         self.movement_message = [0, 0, 0, 0, 0, 0]  #strafe, drive, yaw, updown, tilt, 0
         self.direct_input = [0, 0, 0, 0, 0, 0]
         self.active = True #[True, False, False]  #Analog, South, West
@@ -103,78 +105,85 @@ class Joystick(Module):
         self.gripper_default_sent = False
         super().__init__()
 
-    @Module.loop(1)
-    def run_get_joystick(self):
+    @Async_Task.loop(1)
+    async def get_joystick(self):
         pygame.event.pump()
         for i in range(self.joystick.get_numaxes()):
             self.direct_input[i] = self.joystick.get_axis(i)
 
 
-    @Module.loop(1)
-    def run_get_buttons(self):
-        if self.system == "Windows":
-            self.a_input = self.joystick.get_button(0)
-            self.b_input = [self.b_input[0],self.joystick.get_button(1)]
-            self.x_input = [self.x_input[0],self.joystick.get_button(2)]
-            self.y_input = self.joystick.get_button(3)
-            self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
-            self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
-            self.back_input = [self.back_input[0],self.joystick.get_button(6)]
-            self.start_input = [self.start_input[0],self.joystick.get_button(7)]
-            self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(8)]
-            self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(9)]
-            self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
-            self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
-            self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
-            self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
-        if self.system == "Linux":
-            self.a_input = self.joystick.get_button(0)
-            self.b_input = [self.b_input[0],self.joystick.get_button(1)]
-            self.x_input = [self.x_input[0],self.joystick.get_button(2)]
-            self.y_input = self.joystick.get_button(3)
-            self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
-            self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
-            self.back_input = [self.back_input[0],self.joystick.get_button(6)]
-            self.start_input = [self.start_input[0],self.joystick.get_button(7)]
-            self.guide_input = [self.guide_input[0],self.joystick.get_button(8)]
-            self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(9)]
-            self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(10)]
-            self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
-            self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
-            self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
-            self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
+    @Async_Task.loop(1, condition = "platform.system() == 'Windows'")
+    async def get_buttons_win(self):
+        self.a_input = self.joystick.get_button(0)
+        self.b_input = [self.b_input[0],self.joystick.get_button(1)]
+        self.x_input = [self.x_input[0],self.joystick.get_button(2)]
+        self.y_input = self.joystick.get_button(3)
+        self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
+        self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
+        self.back_input = [self.back_input[0],self.joystick.get_button(6)]
+        self.start_input = [self.start_input[0],self.joystick.get_button(7)]
+        self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(8)]
+        self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(9)]
+        self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
+        self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
+        self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
+        self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
+
+    @Async_Task.loop(1, condition = "platform.system() == 'Linux'")
+    async def get_buttons_linux(self):
+        self.a_input = self.joystick.get_button(0)
+        self.b_input = [self.b_input[0],self.joystick.get_button(1)]
+        self.x_input = [self.x_input[0],self.joystick.get_button(2)]
+        self.y_input = self.joystick.get_button(3)
+        self.lb_input = [self.lb_input[0],self.joystick.get_button(4)]
+        self.rb_input = [self.rb_input[0],self.joystick.get_button(5)]
+        self.back_input = [self.back_input[0],self.joystick.get_button(6)]
+        self.start_input = [self.start_input[0],self.joystick.get_button(7)]
+        self.guide_input = [self.guide_input[0],self.joystick.get_button(8)]
+        self.l_stick_input = [self.l_stick_input[0],self.joystick.get_button(9)]
+        self.r_stick_input = [self.r_stick_input[0],self.joystick.get_button(10)]
+        self.west_input = [self.west_input[0], hat_mapping(self.joystick.get_hat(0))[0]]
+        self.east_input = [self.east_input[0], hat_mapping(self.joystick.get_hat(0))[1]]
+        self.north_input = [self.north_input[0], hat_mapping(self.joystick.get_hat(0))[2]]
+        self.south_input = [self.south_input[0], hat_mapping(self.joystick.get_hat(0))[3]]
 
 
-    @Module.loop(1)
-    def run_mapping(self):
-        if self.system == "Windows":
-            LLR, LUD, BLR, RUD, RLR, _ = self.direct_input
-            LLR = 1*deadzoneleft(LLR)
-            LUD = -1*deadzoneleft(LUD)
-            RLR = 1*deadzoneright(RLR)
-            RUD = -1*deadzoneright(RUD)
-            BLR = -1*deadzone_back(BLR)
-
-        if self.system == "Linux":
-            LLR, LUD, BL, RLR, RUD, BR = self.direct_input
-            LLR = 1*deadzoneleft(LLR)
-            LUD = -1*deadzoneleft(LUD)
-            BL = -((BL+1)/2)
-            RLR = 1*deadzoneright(RLR)
-            RUD = -1*deadzoneright(RUD)
-            BR = (BR+1)/2
-            BLR = deadzone_back(BL+BR)
-
+    @Async_Task.loop(1, condition = "platform.system() == 'Windows'")
+    async def mapping_win(self):
+        LLR, LUD, BLR, RUD, RLR, _ = self.direct_input
+        LLR = 1*deadzoneleft(LLR)
+        LUD = -1*deadzoneleft(LUD)
+        RLR = 1*deadzoneright(RLR)
+        RUD = -1*deadzoneright(RUD)
+        BLR = -1*deadzone_back(BLR)
         if self.control_invert:
-            new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
+            self.new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
         else:
-            new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]
+            self.new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]
 
-        if new_movement_message != self.movement_message:
-            self.movement_message = new_movement_message[:]
+
+    @Async_Task.loop(1, condition = "platform.system() == 'Linux'")
+    async def mapping_linux(self):
+        LLR, LUD, BL, RLR, RUD, BR = self.direct_input
+        LLR = 1*deadzoneleft(LLR)
+        LUD = -1*deadzoneleft(LUD)
+        BL = -((BL+1)/2)
+        RLR = 1*deadzoneright(RLR)
+        RUD = -1*deadzoneright(RUD)
+        BR = (BR+1)/2
+        BLR = deadzone_back(BL+BR)
+        if self.control_invert:
+            self.new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
+        else:
+            self.new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]
+
+
+    @Async_Task.loop(1)
+    async def pub_loop(self):
+        if self.new_movement_message != self.movement_message:
+            self.movement_message = self.new_movement_message[:]
         pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
 
-        #print(button_pressed(self.l_stick_input))
         if button_pressed(self.l_stick_input):
             self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%4
             pub.sendMessage("gamepad.profile", message = {"Profile_Dict": ProfileDict[self.thumb_profile_cycle]})
@@ -218,12 +227,8 @@ class Joystick(Module):
 
 
 
-
-    def destroy(self):
-        print("Destroyed")
-
 if __name__ == "__main__":
-    from Module_Base_Async import AsyncModuleManager
+    from Module_Base import ModuleManager
     def debug_listener_profile(message):
         print("\t\t\t\t\t", "profile", message,"\n")
 
@@ -245,14 +250,16 @@ if __name__ == "__main__":
     pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
     pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
-    AsyncModuleManager.register_module(joystick)
+    mm = ModuleManager("", (400, 400))
+    mm.start(1)
+    mm.register_all()
+    mm.start_all()
 
     try:
-        AsyncModuleManager.run_forever()
+        mm.run_forever()
     except KeyboardInterrupt:
         print("keyboard interrupt")
     except BaseException:
         pass
     finally:
         print("Closing Loop")
-        AsyncModuleManager.stop_all()

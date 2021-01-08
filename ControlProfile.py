@@ -18,8 +18,7 @@ command.movement
 
 
 from pubsub import pub
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Async_Task, Module
 
 class ControlProfile(Module):
     def __init__(self, max_percentage = 100, formula_modifier = 30, activate = 'A'):
@@ -30,10 +29,6 @@ class ControlProfile(Module):
         self.formula_modifier = float(formula_modifier)
         self.activate = activate
         self.profile_change = 'A'
-
-    @Module.asyncloop(1)
-    def run(self):
-        pass
 
     @staticmethod
     def PowerFunction(A, B):
@@ -72,16 +67,18 @@ class __Test_Case_Send__(Module):
     def command_movement_listener(self, message):
         print(message["command_message"])
 
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         pub.sendMessage("gamepad.movement", message = {"gamepad_message": (0.2,0,0,0,0,0)})
         pub.sendMessage("gamepad.profile", message = {"Profile_Dict": 'A'})
 
 if __name__ == "__main__":
-    from Gamepad import Gamepad
+    from Joystick import Joystick
+    from Module_Base import ModuleManager
 
-    AsyncModuleManager = AsyncModuleManager()
+    
 
-    Gamepad = Gamepad()
+    Gamepad = Joystick()
     #Gamepad.start(100)
 
     __test_case_send__ = __Test_Case_Send__()
@@ -92,14 +89,19 @@ if __name__ == "__main__":
     ControlProfileC = ControlProfile(50, 0.0001, 'C')
     ControlProfileD = ControlProfile(30, 0.0001, 'D')
 
-    AsyncModuleManager.register_modules(__test_case_send__, ControlProfileA, ControlProfileB, ControlProfileC, ControlProfileD)
+    mm = ModuleManager("", (400, 400))
+    mm.start(1)
+    mm.register_all()
+    mm.start_all()
+
+    mm.register_modules(__test_case_send__, ControlProfileA, ControlProfileB, ControlProfileC, ControlProfileD)
 
     try:
-        AsyncModuleManager.run_forever()
+        mm.run_forever()
     except KeyboardInterrupt:
         pass
     except BaseException:
         pass
     finally:
         print("Closing Loop")
-        AsyncModuleManager.stop_all()
+        mm.stop_all()

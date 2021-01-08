@@ -13,8 +13,7 @@ can.send
 '''
 
 
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Module, Async_Task
 from pubsub import pub
 import yaml
 import numpy as np
@@ -52,8 +51,8 @@ class Thrusters(Module):
                 else:
                     self.target_power[0][counter] = 0
             #print(self.target_power)
-    @Module.loop(1)
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         rate = self.rate * (1 / self.interval)
         #print("rate: ", rate)
         for list in self.target_power:

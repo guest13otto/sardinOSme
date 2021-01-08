@@ -10,8 +10,7 @@ Thruster.Power
     messsage: FL, FR, BL, BR, UF, UB <-1, 1>
 '''
 
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Module, Async_Task
 from pubsub import pub
 import numpy as np
 import yaml
@@ -131,11 +130,11 @@ class Thruster_Power(Module):
         finalList = finalList.reshape(1,6)
         finalList = finalList.tolist()
         finalList = [item for item in finalList if isinstance(item,list)]
-        print(finalList)
+        #print(finalList)
         pub.sendMessage("Thruster.Power", message = {"Thruster_message": finalList})
 
-    @Module.asyncloop(1)
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         pass
 
 class __Test_Case_Combo__(Module):
@@ -155,14 +154,15 @@ class __Test_Case_Combo__(Module):
         print(f"max UF: {float(max(np.abs(self.UF_List)))}")
         print(f"max UB: {float(max(np.abs(self.UB_List)))}")
 
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         combined = ((x,y,tz,y,tx) for x in self.List[0] for y in self.List[1] for tz in self.List[2] for y in self.List[3] for tx in self.List[4])
         for combo in combined:
             '''if (combo[0] + combo[1] == 1  or combo[0] + combo[1] == -1 or (combo[0] == 0 and combo[1] == 0)) and (combo[2] + combo[4] == -1 \
             or combo[2] + combo[4] == 1 or (combo[2] == 0 and combo[4] == 0)):'''
             self.message = (combo[0], combo[1], combo[2], combo[3], combo[4], 0)
             pub.sendMessage("command.movement", message = {"command_message": self.message})
-        self.stop_all()
+        #self.stop_all()
 
 class __Test_Case_Single__(Module):
     def __init__(self):

@@ -18,8 +18,8 @@ class Plot:
         self.axes = Axis(self.screen, self.screen_width, self.screen_height, self.xliftoff, self.yliftoff, self.bar_width)
         self.movement = 0
         self.profile = 0
-        self.power = 0
-        self.charts = 0
+        self.power = [0, 0, 0, 0, 0, 0]
+        self.charts = [0, 0, 0, 0, 0, 0]
         pub.subscribe(self.movement_handler, "gamepad.movement")
         pub.subscribe(self.profile_handler, "gamepad.profile")
         pub.subscribe(self.power_handler, "Thruster.Power")
@@ -32,6 +32,7 @@ class Plot:
         self.screen.fill((200, 200, 255))
         self.screen = self.axes.draw()
 
+        #values = [0, 0, 0, 0, 0, 0]
         for i in range(6):
             self.screen = directions[i].draw(self.screen, values[i], self.labels[i])
 

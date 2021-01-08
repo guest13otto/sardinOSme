@@ -1,28 +1,15 @@
-from Module_Loader import Loader
-import sys
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import ModuleManager
 
-AsyncModuleManager = AsyncModuleManager()
-config_name = "config.yaml"
-
-if len(sys.argv) > 1:
-    config_name = sys.argv[1]
-
-nodes = Loader.load_all(config_name)
-
-for n in nodes:
-    n["node"].start(n["frequency"])
-    try:
-        AsyncModuleManager.register_module(n["node"])
-    except BaseException:
-        pass
-
+mm = ModuleManager("config.yaml")#, (400, 400))
+mm.start(1)
+mm.register_all()
+mm.start_all()
 try:
-    AsyncModuleManager.run_forever()
+    mm.run_forever()
+    #AsyncModuleManager.run_forever()
 except KeyboardInterrupt:
     pass
 except BaseException:
     pass
 finally:
     print("Closing Loop")
-    AsyncModuleManager.stop_all()

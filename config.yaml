@@ -1,8 +1,4 @@
 Subfolders: [GUI]
-# Gamepad:
-#  file: Gamepad
-#  varclass: Gamepad
-#  frequency: 100
 Joystick:
   file: Joystick
   varclass: Joystick
@@ -61,17 +57,17 @@ Gripper:
   frequency: 1
   address: 0x21
   speed: 17000 # 0 - 32767
-#Logger:
-#  file: Logger
-#  varclass: Logger
+## Logger:
+##  file: Logger
+##  varclass: Logger
+##  frequency: 1
+##  Print: True
+##  Log: True
+##  Topics: "Thruster" #All Topicss: gamepad, command, Thruster, info, can, log
+# CAN_Handler:
+#  file: CAN_Handler
+#  varclass: CAN_Handler
 #  frequency: 1
-#  Print: True
-#  Log: True
-#  Topics: "Thruster" #All Topicss: gamepad, command, Thruster, info, can, log
-CAN_Handler:
-  file: CAN_Handler
-  varclass: CAN_Handler
-  frequency: 1
 GUI:
   file: main
   varclass: GUI

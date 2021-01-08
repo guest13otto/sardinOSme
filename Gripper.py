@@ -1,5 +1,4 @@
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Module, Async_Task
 from pubsub import pub
 import asyncio
 
@@ -10,7 +9,8 @@ class Gripper(Module):
         self.address = address
         pub.subscribe(self.Listener, "gamepad.gripper")
 
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         pass
 
     def Listener(self, message):

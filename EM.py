@@ -1,5 +1,4 @@
-from Module_Base_Async import Module
-from Module_Base_Async import AsyncModuleManager
+from Module_Base import Module, Async_Task
 from pubsub import pub
 import asyncio
 
@@ -14,11 +13,12 @@ EMLRcommand = {
 class EM(Module):
     def __init__(self, name, address):
         super().__init__()
-        self.name = name
-        self.address = address
-        exec(f'pub.subscribe(self.Listener, "gamepad.{self.name}")')
+        #self.name = name
+        #self.address = address
+        #exec(f'pub.subscribe(self.Listener, "gamepad.{self.name}")')
 
-    def run(self):
+    @Async_Task.loop(1)
+    async def run(self):
         pass
 
     def Listener(self, message):
