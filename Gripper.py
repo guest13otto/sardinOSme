@@ -5,7 +5,7 @@ import asyncio
 class Gripper(Module):
     def __init__(self, address, speed):
         super().__init__()
-        self.speed = speed
+        self.speed = int(speed)
         self.address = address
         pub.subscribe(self.Listener, "gamepad.gripper")
 

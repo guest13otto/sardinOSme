@@ -95,3 +95,6 @@ GUI:
 #    file: socketpubsub
 #    varclass: spub
 #    frequency: 1
+_Module_Manager:
+  terminal_frequency: 150
+

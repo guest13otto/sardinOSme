@@ -338,38 +338,20 @@ class Async_Task(Base_Task):
     #        return Async_Task(func, relative_speed_multiplier = relative_speed_multiplier, ifreq = ifreq, condition = condition, callback = callback)
     #    return inner
 
-    class loop:
+    class loop():
         def __init__(self, relative_speed_multiplier = 1, ifreq = None, condition = "", callback = ""):
-            self.__relative_speed_multiplier = relative_speed_multiplier
-            self.__ifreq = ifreq
-            self.__condition = condition
-            self.__callback = callback
-            self.__is_loop = True
-
+            self.__info = {"__task_info": True,
+                           "__task_type": "async",
+                           "relative_speed_multiplier": relative_speed_multiplier,
+                           "ifreq": ifreq,
+                           "condition": condition,
+                           "callback": callback,
+                           "is_loop": True}
+        
         def __call__(self, func):
-            self.__func = func
-            return self
-
-        def get_rsm(self):
-            return self.__relative_speed_multiplier
-
-        def get_func(self):
-            return self.__func
-
-        def get_ifreq(self):
-            return self.__ifreq
-
-        def get_condition(self):
-            return self.__condition
-
-        def get_callback(self):
-            return self.__callback
-
-        def get_is_loop(self):
-            return self.__is_loop
-
-        def is_registerable(self):
-            return True
+            self.__info.update({"func": func})
+            return self.__info
+        
 
     async def loop_periodically(self):
         try:
@@ -389,7 +371,7 @@ class Async_Task(Base_Task):
             traceback.print_tb(e.__traceback__)
             print(f"{type(e).__name__}: {e}")
         finally:
-            if self.state == "terminated":
+            if self.state != "terminated":
                 self.terminate()
 
 
@@ -399,30 +381,18 @@ class Async_Task(Base_Task):
     #        return Async_Task(func, is_loop = False, condition = condition, callback = callback)
     #    return inner
 
-    class once:
+    class once():
         def __init__(self, condition = "", callback = ""):
-            self.__condition = condition
-            self.__callback = callback
-            self.__is_loop = False
+            self.__info = {"__task_info": True,
+                           "__task_type": "async",
+                           "condition": condition,
+                           "callback": callback,
+                           "is_loop": False}
+
 
         def __call__(self, func):
-            self.__func = func
-            return self
-
-        def get_func(self):
-            return self.__func
-
-        def get_condition(self):
-            return self.__condition
-
-        def get_callback(self):
-            return self.__callback
-
-        def get_is_loop(self):
-            return self.__is_loop
-
-        def is_registerable(self):
-            return True
+            self.__info.update({"func": func})
+            return self.__info
 
     async def run_once(self):
         try:
@@ -431,7 +401,7 @@ class Async_Task(Base_Task):
             traceback.print_tb(e.__traceback__)
             print(f"{type(e).__name__}: {e}")
         finally:
-            if self.state == "terminated":
+            if self.state != "terminated":
                 self.terminate()
 
     def __repr__(self):
@@ -534,18 +504,22 @@ class Module:
             raise RuntimeError("both interval and task code generator must be supplied")
         
         """
-        getattr(self, func_name) returns a registerable object (loop, once) which contains all the arguments from the decorators
-        use get_func(), get_rsm(), get_ifreq(), get_is_loop(), get_callable() to access the arguments retrieved
-        create Async_Task object in Module locally
+        getattr(self, func_name) returns a dictionary which contains args and kwargs retrieved from decorators
+        '__task_info' is added into the dictionary to determine if this dictionary should be used to make a Task object or not
+        '__task_type' is added to determine which Task class should be used to construct this Task object
+        only 'func' is allowed to be a postional argument, the rest are passed in as kwargs in dict form
         """
 
         task_list = []
-        async_construct_infos = [getattr(self, func_name) for func_name in dir(self) if hasattr(getattr(self, func_name), "is_registerable")]
-        for aci in async_construct_infos:
-            if aci.get_is_loop():
-                task_list.append(Async_Task(aci.get_func(), relative_speed_multiplier = aci.get_rsm(), ifreq = aci.get_ifreq(), is_loop = aci.get_is_loop(), condition = aci.get_condition(), callback = aci.get_callback()))
-            else:
-                task_list.append(Async_Task(aci.get_func(), is_loop = aci.get_is_loop(), condition = aci.get_condition(), callback = aci.get_callback()))
+        for func_name in dir(self):
+            potential_task = getattr(self, func_name)
+            if type(potential_task) == dict:
+                if potential_task.pop("__task_info", False):
+                    func = potential_task.pop("func")
+                    task_type = potential_task.pop("__task_type")
+                    if task_type == "async":
+                        task_list.append(Async_Task(func, **potential_task))
+
         for task in task_list:
             self.__prep_task(task)
             self.run_task(task)
@@ -843,7 +817,7 @@ class VerticalScrolledFrame(tk.Frame):
 
 
 class ModuleManager(Module, tk.Tk):
-    width_height = (0, 0)
+    reference = Reference(["config"])
     class Loader(): 
         @staticmethod
         def load_all(YAML_File):
@@ -1045,8 +1019,8 @@ class ModuleManager(Module, tk.Tk):
         self.terminal.output1.configure(state = "disabled")
 
 
-    
-    @Async_Task.loop(ifreq = 150, condition = "width_height != (0, 0)")
+    #reference._Module_Manager.terminal_frequency
+    @Async_Task.loop(ifreq = reference._Module_Manager.terminal_frequency, condition = "width_height != (0, 0)")
     async def update_loop(self):
         self.update_idletasks()
         self.update()
