@@ -55,8 +55,16 @@ Gripper:
   file: Gripper
   varclass: Gripper
   frequency: 1
+  name: gripper
   address: 0x21
   speed: 17000 # 0 - 32767
+Erector:
+  file: Gripper
+  varclass: Gripper
+  frequency: 1
+  name: erector
+  address: 0x22
+  speed: 17000
 ## Logger:
 ##  file: Logger
 ##  varclass: Logger
@@ -97,4 +105,3 @@ GUI:
 #    frequency: 1
 _Module_Manager:
   terminal_frequency: 150
-
