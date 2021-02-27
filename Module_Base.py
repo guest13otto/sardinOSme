@@ -407,6 +407,160 @@ class Async_Task(Base_Task):
     def __repr__(self):
         return f"<Task [{self.__task_code}|{self.__name}|{self.__state}|{self.__args}|{self.__kwargs}]>"
 
+class Pub_Task(Base_Task):
+    
+    def __init__(self, func, topic, condition = "", callback = ""):
+        self.__func = func
+        self.__topic = topic
+        self.__condition_statement = condition
+        self.__callback_statement = callback
+        self.__instance = None
+        self.__name = ""
+        self.__unpaused = False
+        self.__task_code = None
+        self.__prev_code = None
+        self.__ran = False
+        self.__args = ()
+        self.__kwargs = {}
+        self.__state = "inactive"
+        super().__init__()
+
+    @Task_State(1)
+    def new(self, task_code):
+        self.__task_code = task_code
+
+    @Task_State(2)
+    def ready(self, *args, interval = 1, relative_speed_multiplier = None, ifreq = None, **kwargs): 
+        if self.__task_code == None:
+            raise RuntimeError("task code not assigned to task")
+        self.__args = args
+        self.__kwargs = kwargs
+
+    @Task_State(3)
+    def run(self):
+        #Initial run
+        if self.conditions_is_met():
+            self.__unpaused = True
+            self.__strong_ref, _ = pub.subscribe(self.__listener, self.__topic)
+        else:
+            self.terminate()
+
+    @property
+    def running(self):
+        if self.__unpaused:
+            return True
+        else:
+            return False
+
+    @Task_State(4)
+    def wait(self):
+        self.__unpaused = False
+
+    @Task_State(5)
+    def interrupt(self): #Back to ready state
+        del self.__strong_ref
+
+    @Task_State(6)
+    def terminate(self):
+        try:
+            del self.__strong_ref
+        except:
+            pass
+        finally:
+            self.callback()
+            self.__ran = False
+            self.__prev_code = self.__task_code
+            self.__task_code = None
+
+
+    @property
+    def func(self):
+        return self.__func
+
+    def set_func(self, func):
+        self.__func = func
+
+    @property
+    def instance(self):
+        return self.__instance
+
+    def set_instance(self, instance):
+        self.__instance = instance
+
+    @property
+    def name(self):
+        return self.__name
+
+    def set_name(self, name):
+        self.__name = name
+
+    @property
+    def task_code(self):
+        return self.__task_code
+
+    def set_task_code(self, task_code):
+        self.__task_code = task_code
+
+    @property
+    def prev_code(self):
+        return self.__prev_code
+
+    def set_prev_code(self, task_code):
+        self.__prev_code = task_code
+
+    @property
+    def ran(self):
+        return self.__ran
+
+    def set_ran(self, ran):
+        self.__ran = ran
+
+    @property
+    def state(self):
+        return self.__state
+
+    def set_state(self, state):
+        self.__state = state
+
+    def conditions_is_met(self):
+        #Default value branch
+        if self.__condition_statement == "":
+            return True  
+        #Evaluate condition
+        result = eval(self.__condition_statement, {**globals(), **vars(self.__instance)}) 
+        return result if type(result) == bool else False
+
+    def callback(self):
+        if self.__callback_statement!= "":
+            getattr(self.__instance, self.__callback_statement)()
+
+    class subscribe():
+        def __init__(self, topic, condition = "", callback = ""):
+            self.__info = {"__task_info": True,
+                           "__task_type": "pub",
+                           "topic": topic,
+                           "condition": condition,
+                           "callback": callback}
+        
+        def __call__(self, func):
+            self.__info.update({"func": func})
+            return self.__info
+        
+
+    def __listener(self, message):
+        try:
+            print(self.__unpaused)
+            if self.__unpaused:
+                self.__func(self.__instance, message, *self.__args, **self.__kwargs)
+        except Exception as e:
+            traceback.print_tb(e.__traceback__)
+            print(f"{type(e).__name__}: {e}")
+        finally:
+            if self.state != "terminated":
+                self.terminate()
+
+    def __repr__(self):
+        return f"<Task [{self.__task_code}|{self.__name}|{self.__state}|{self.__args}|{self.__kwargs}]>"
     
 class Module:
     CODE = True
@@ -507,18 +661,20 @@ class Module:
         getattr(self, func_name) returns a dictionary which contains args and kwargs retrieved from decorators
         '__task_info' is added into the dictionary to determine if this dictionary should be used to make a Task object or not
         '__task_type' is added to determine which Task class should be used to construct this Task object
-        only 'func' is allowed to be a postional argument, the rest are passed in as kwargs in dict form
+        only 'func' is allowed to be a positional argument, the rest are passed in as kwargs in dict form
         """
 
         task_list = []
         for func_name in dir(self):
             potential_task = getattr(self, func_name)
             if type(potential_task) == dict:
-                if potential_task.pop("__task_info", False):
-                    func = potential_task.pop("func")
-                    task_type = potential_task.pop("__task_type")
+                if potential_task.get("__task_info", False):
+                    func = potential_task.get("func")
+                    task_type = potential_task.get("__task_type")
                     if task_type == "async":
-                        task_list.append(Async_Task(func, **potential_task))
+                        task_list.append(Async_Task(func, **{key: value for key,value in potential_task.items() if key not in {"__task_info", "func", "__task_type"}}))
+                    if task_type == "pub":
+                        task_list.append(Pub_Task(func, **{key: value for key,value in potential_task.items() if key not in {"__task_info", "func", "__task_type"}}))
 
         for task in task_list:
             self.__prep_task(task)
@@ -726,7 +882,8 @@ class Module:
             else:
                 print(f"task with name {task_identifier} does not exist")
     
-
+    def show_tasks(self):
+        return self.__active_tasks
 
 
     def __repr__(self):
@@ -1024,6 +1181,8 @@ class ModuleManager(Module, tk.Tk):
     async def update_loop(self):
         self.update_idletasks()
         self.update()
+        print(self.__moduleName_module["ProfileA"].show_tasks())
+        self.__moduleName_module["ProfileA"].pause_task("0x9")
 
 
 
