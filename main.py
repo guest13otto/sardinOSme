@@ -2,15 +2,8 @@ import sys
 import pygame
 from pubsub import pub
 import random
-
-# import from parent directory
-#currentdir = os.path.dirname(os.path.realpath(__file__))
-#parentdir = os.path.dirname(currentdir)
-#sys.path.insert(0, parentdir)
 from Module_Base import Module, Async_Task, ModuleManager
-
 sys.path.insert(1, './GUI')
-# noinspection PyUnresolvedReferences
 from plot import Plot
 from popup import *
 
@@ -53,19 +46,6 @@ class GUI(Module):
             if event.type == pygame.QUIT:
                 pygame.quit()
 
-    def test_handler(self, movement, profile):
-        self.movement = movement
-        self.profile = profile
-
-    def movement_handler(self, message):
-        self.movement = message
-
-    def power_handler(self, message):
-        self.power = message
-
-    def profile_handler(self, message):
-        self.profile = message
-
 
 class TestCaseSend(Module):
     def __init__(self):
@@ -81,7 +61,7 @@ class TestCaseSend(Module):
         self.movement.append(0.000)
         pub.sendMessage('gamepad.movement', message={"gamepad_message": self.movement})
 
-    @Async_Task.loop(0.03)
+    @Async_Task.loop(0.003)
     async def run2(self):
         pArr = ['A', 'B', 'C', 'D']
         self.profile = pArr[random.randint(0, 3)]
@@ -100,7 +80,7 @@ class TestCaseSend(Module):
         states = [-1, 1, 0]
         pub.sendMessage('gamepad.{}'.format(topics[index]), message={"tool_state": random.choice(states[:hold[index]])})
 
-    @Async_Task.loop(0.02)
+    @Async_Task.loop(0.002)
     async def run5(self):
         flip = random.randint(0, 1)
         if flip:

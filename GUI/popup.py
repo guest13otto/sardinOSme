@@ -53,61 +53,6 @@ class ProfilePopup:
         return self.surface
 
 
-class EMPopup:
-    def __init__(self, screen_width, screen_height, order):
-        super().__init__()
-        self.screen_width = screen_width
-        self.screen_height = screen_height
-        self.surface = pygame.Surface((screen_width, screen_height))
-        self.surface.set_colorkey((1, 1, 1))
-        self.x = 100
-        self.y = 75
-        self.emL = 0
-        self.emR = 0
-        self.labels = ['OFF', 'ON']
-        coral = (245, 125, 124)
-        blue = (90, 128, 158)
-        colours = [coral, blue]
-        self.colour = colours[order-1]
-        self.font = pygame.font.SysFont("Courier New", 16)
-        pub.subscribe(self.em_handler, "gamepad.EM{}".format(order))
-        self.order = order
-        self.expired = time.time()
-
-    def em_handler(self, message):
-        self.set_em(message["EM_L"], message["EM_R"])
-
-    def set_em(self, emL, emR):
-        if emL != self.emL or emR != self.emR:
-            self.emL = emL
-            self.emR = emR
-            self.expired = time.time() + 1
-
-    def update(self):
-        if self.expired > time.time():
-            self.surface.fill((1, 1, 1))
-            emSurf = pygame.Surface((self.x, self.y))
-            emSurf.fill(self.colour)
-
-            textSurfL = self.font.render('EM_L: ' + self.labels[self.emL], True, (0, 0, 0))
-            textRectL = textSurfL.get_rect()
-            textRectL.center = (self.x / 2, self.y / 2 - 10)
-
-            textSurfR = self.font.render('EM_R: ' + self.labels[self.emR], True, (0, 0, 0))
-            textRectR = textSurfR.get_rect()
-            textRectR.center = (self.x / 2, self.y / 2 + 10)
-
-            emSurf.blit(textSurfL, textRectL)
-            emSurf.blit(textSurfR, textRectR)
-            self.surface.blit(emSurf, ((self.order-1)*(self.screen_width-self.x), self.screen_height-self.y))
-        else:
-            self.surface.fill((1, 1, 1))
-            label = Label(self.screen_width, self.screen_height, (1, self.order-1), 14, bgColour=self.colour)
-            text = 'EM_L: ' + self.labels[self.emL] + ' EM_R: ' + self.labels[self.emR]
-            self.surface.blit(label.update(text), (0, 0))
-        return self.surface
-
-
 class InvertPopup:
     def __init__(self, screen_width, screen_height):
         super().__init__()
@@ -164,8 +109,8 @@ class ToolsPopup:
         self.surface.set_colorkey((1, 1, 1))
         self.x = 100
         self.y = 75
-        self.index = -1
         self.tool = -1
+        self.newTool = -1
         self.toolState = -1
         self.labels = ['Gripper', 'EM1', 'EM2', 'Erector']
         self.hold = [True, False, False, True]
@@ -181,18 +126,34 @@ class ToolsPopup:
         self.font = pygame.font.SysFont("Courier New", 16)
         self.topics = ["gamepad.gripper", "gamepad.EM1", "gamepad.EM2", "gamepad.erector"]
         for i in range(4):
-            self.index = i
-            pub.subscribe(self.tool_handler, self.topics[i])
+            x = eval('self.' + self.topics[i][8:] + '_handler')
+            pub.subscribe(x, self.topics[i])
         self.expired = time.time()
+
+    def gripper_handler(self, message):
+        self.newTool = 0
+        self.tool_handler(message)
+
+    def EM1_handler(self, message):
+        self.newTool = 1
+        self.tool_handler(message)
+
+    def EM2_handler(self, message):
+        self.newTool = 2
+        self.tool_handler(message)
+
+    def erector_handler(self, message):
+        self.newTool = 3
+        self.tool_handler(message)
 
     def tool_handler(self, message):
         self.set_tool(message["tool_state"])
 
     def set_tool(self, message):
         self.toolState = message
-        if self.tool != self.index:
+        if self.tool != self.newTool:
             self.expired = time.time() + 1
-            self.tool = self.index
+            self.tool = self.newTool
 
     def update(self):
         self.surface.fill((1, 1, 1))
@@ -209,7 +170,6 @@ class ToolsPopup:
                 self.surface.blit(toolSurf, (self.screen_width-self.x, self.screen_height-self.y))
             else:
                 self.surface.fill((1, 1, 1))
-                print(self.toolState)
                 label = Label(self.screen_width, self.screen_height, (1, 1), 14, bgColour=self.stateColours[self.toolState+1])
                 self.surface.blit(label.update((self.labels[self.tool] + ': ' + str(self.toolState))), (0, 0))
         return self.surface
