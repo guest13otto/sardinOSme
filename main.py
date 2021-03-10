@@ -1,4 +1,4 @@
-import sys, os, inspect
+import sys
 import pygame
 from pubsub import pub
 import random
@@ -7,11 +7,12 @@ import random
 #currentdir = os.path.dirname(os.path.realpath(__file__))
 #parentdir = os.path.dirname(currentdir)
 #sys.path.insert(0, parentdir)
-from Module_Base import Module, Async_Task
+from Module_Base import Module, Async_Task, ModuleManager
 
 sys.path.insert(1, './GUI')
+# noinspection PyUnresolvedReferences
 from plot import Plot
-from popup import ProfilePopup, EMPopup, InvertPopup
+from popup import *
 
 
 class GUI(Module):
@@ -30,9 +31,8 @@ class GUI(Module):
 
         self.widgets = []
         self.widgets.append((ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
-        self.widgets.append((EMPopup(self.screen_width, self.screen_height, 1), (0, 0)))
-        self.widgets.append((EMPopup(self.screen_width, self.screen_height, 2), (0, 0)))
         self.widgets.append((InvertPopup(self.screen_width, self.screen_height), (0, 0)))
+        self.widgets.append((ToolsPopup(self.screen_width, self.screen_height), (0, 0)))
 
         self.charts = []
         self.charts.append((Plot(['strafe', 'drive', 'yaw', 'ud', 'tilt', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
@@ -81,23 +81,27 @@ class TestCaseSend(Module):
         self.movement.append(0.000)
         pub.sendMessage('gamepad.movement', message={"gamepad_message": self.movement})
 
-    @Async_Task.loop(0.003)
-    def run2(self):
+    @Async_Task.loop(0.03)
+    async def run2(self):
         pArr = ['A', 'B', 'C', 'D']
         self.profile = pArr[random.randint(0, 3)]
         pub.sendMessage('gamepad.profile', message={"Profile_Dict": self.profile})
 
     @Async_Task.loop(1)
-    def run3(self):
+    async def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
-        pub.sendMessage('Thruster.Power', message={"Thruster_message": [self.power]})
+        pub.sendMessage('Thruster.Power', message={"Thruster_message": self.power})
 
-    @Async_Task.loop(0.002)
-    def run4(self):
-        pub.sendMessage('gamepad.EM{}'.format(random.randint(1, 2)), message={"EM_L": random.randint(0, 1), "EM_R": random.randint(0, 1)})
+    @Async_Task.loop(0.02)
+    async def run4(self):
+        topics = ["gripper", "EM1", "EM2", "erector"]
+        hold = [3, 2, 2, 3]
+        index = random.randint(0, 3)
+        states = [-1, 1, 0]
+        pub.sendMessage('gamepad.{}'.format(topics[index]), message={"tool_state": random.choice(states[:hold[index]])})
 
-    @Async_Task.loop(0.002)
-    def run5(self):
+    @Async_Task.loop(0.02)
+    async def run5(self):
         flip = random.randint(0, 1)
         if flip:
             self.invert = not self.invert
@@ -109,14 +113,16 @@ if __name__ == "__main__":
     gui = GUI()
     test_case_send.start(50)
     gui.start(30)
-    AsyncModuleManager.register_modules(gui, test_case_send)
+    mm = ModuleManager("")
+    mm.start(1)
+    mm.register_all()
+    mm.start_all()
 
     try:
-        AsyncModuleManager.run_forever()
+        mm.run_forever()
     except KeyboardInterrupt:
         pass
     except BaseException:
         pass
     finally:
         print("Closing Loop")
-        AsyncModuleManager.stop_all()
