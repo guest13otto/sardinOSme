@@ -112,7 +112,9 @@ class ToolsPopup:
         self.tool = -1
         self.newTool = -1
         self.toolState = -1
+        self.emStates = [[False, False], [False, False]]
         self.labels = ['Gripper', 'EM1', 'EM2', 'Erector']
+        self.emLabels = ['OFF', 'ON']
         self.hold = [True, False, False, True]
         teal = (108, 194, 189)
         blue = (90, 128, 158)
@@ -137,10 +139,12 @@ class ToolsPopup:
     def EM1_handler(self, message):
         self.newTool = 1
         self.tool_handler(message)
+        self.set_em(0, message["tool_state"])
 
     def EM2_handler(self, message):
         self.newTool = 2
         self.tool_handler(message)
+        self.set_em(1, message["tool_state"])
 
     def erector_handler(self, message):
         self.newTool = 3
@@ -154,6 +158,12 @@ class ToolsPopup:
         if self.tool != self.newTool:
             self.expired = time.time() + 1
             self.tool = self.newTool
+
+    def set_em(self, order, message):
+        if message > 0:
+            self.emStates[order][0] = not self.emStates[order][0]
+        else:
+            self.emStates[order][1] = not self.emStates[order][1]
 
     def update(self):
         self.surface.fill((1, 1, 1))
@@ -170,6 +180,12 @@ class ToolsPopup:
                 self.surface.blit(toolSurf, (self.screen_width-self.x, self.screen_height-self.y))
             else:
                 self.surface.fill((1, 1, 1))
-                label = Label(self.screen_width, self.screen_height, (1, 1), 14, bgColour=self.stateColours[self.toolState+1])
-                self.surface.blit(label.update((self.labels[self.tool] + ': ' + str(self.toolState))), (0, 0))
+                label = Label(self.screen_width, self.screen_height, (1, 1), 14, bgColour=self.toolColours[self.tool])
+                self.surface.blit(label.update(self.labels[self.tool]), (0, 0))
+        emLabel = Label(self.screen_width, self.screen_height, (1, 0), 14, bgColour=self.toolColours[2])
+        emTexts = ['', '']
+        for i in range(2):
+            emTexts[i] = 'EM{} L:{} R:{}'.format(i+1, self.emLabels[int(self.emStates[i][0])], self.emLabels[int(self.emStates[i][1])])
+        emText = '  '.join(emTexts)
+        self.surface.blit(emLabel.update(emText), (1, 0))
         return self.surface

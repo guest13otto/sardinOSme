@@ -1,44 +1,45 @@
 Subfolders: [GUI]
-Joystick:
+_Joystick:
   file: Joystick
   varclass: Joystick
   frequency: 100
-ProfileA:
+_ProfileA:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'A'
   max_percentage: 100
   formula_modifier: 30
-ProfileB:
+_ProfileB:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'B'
   max_percentage: 70
   formula_modifier: 50
-ProfileC:
+_ProfileC:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'C'
   max_percentage: 50
   formula_modifier: 50
-ProfileD:
+_ProfileD:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'D'
   max_percentage: 30
   formula_modifier: 50
-ThrusterPower:
+_ThrusterPower:
   file: Thruster_Power
   varclass: Thruster_Power
   frequency: 1
-Thrusters:
+_Thrusters:
   file: Thrusters
   varclass: Thrusters
   frequency: 10
+<<<<<<< HEAD
 EM1:
   device: EM1
   file: EM
@@ -47,18 +48,28 @@ EM1:
   address: 0x33
 EM2:
   device: EM2
+=======
+_EM1:
+  name: EM1
+  file: EM
+  varclass: EM
+  frequency: 1
+  address: 0x31
+_EM2:
+  name: EM2
+>>>>>>> 187575cc35e3cc135cfe3a2fad1999d81b32b673
   file: EM
   varclass: EM
   frequency: 1
   address: 0x32
-Gripper:
+_Gripper:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: gripper
   address: 0x22
   speed: 17000 # 0 - 32767
-Erector:
+_Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
@@ -72,13 +83,17 @@ Erector:
 ##  Print: True
 ##  Log: True
 ##  Topics: "Thruster" #All Topicss: gamepad, command, Thruster, info, can, log
-CAN_Handler:
+_CAN_Handler:
   file: CAN_Handler
   varclass: CAN_Handler
   frequency: 1
 GUI:
   file: main
   varclass: GUI
+  frequency: 30
+TestCaseSwnd:
+  file: main
+  varclass: TestCaseSend
   frequency: 30
 # pubsender:
 #    file: pubsender
