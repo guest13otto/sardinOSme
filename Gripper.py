@@ -3,12 +3,12 @@ from pubsub import pub
 import asyncio
 
 class Gripper(Module):
-    def __init__(self, name, address, speed):
+    def __init__(self, device, address, speed):
         super().__init__()
-        self.name = name
+        self.device = device
         self.speed = int(speed)
         self.address = address
-        exec(f'pub.subscribe(self.Listener, "gamepad.{self.name}")')
+        exec(f'pub.subscribe(self.Listener, "gamepad.{self.device}")')
 
     @Async_Task.loop(1)
     async def run(self):

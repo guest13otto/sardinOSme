@@ -11,13 +11,13 @@ EMLRcommand = {
                 }
 
 class EM(Module):
-    def __init__(self, name, address):
+    def __init__(self, device, address):
         super().__init__()
-        self.name = name
+        self.device = device
         self.address = address
         self.EM_L = 0
         self.EM_R = 0
-        exec(f"pub.subscribe(self.Listener, 'gamepad.{self.name}')")
+        exec(f"pub.subscribe(self.Listener, 'gamepad.{self.device}')")
 
     @Async_Task.loop(1)
     async def run(self):

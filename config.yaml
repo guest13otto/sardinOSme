@@ -40,13 +40,13 @@ Thrusters:
   varclass: Thrusters
   frequency: 10
 EM1:
-  name: EM1
+  device: EM1
   file: EM
   varclass: EM
   frequency: 1
-  address: 0x31
+  address: 0x33
 EM2:
-  name: EM2
+  device: EM2
   file: EM
   varclass: EM
   frequency: 1
@@ -55,15 +55,15 @@ Gripper:
   file: Gripper
   varclass: Gripper
   frequency: 1
-  name: gripper
-  address: 0x21
+  device: gripper
+  address: 0x22
   speed: 17000 # 0 - 32767
 Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
-  name: erector
-  address: 0x22
+  device: erector
+  address: 0x21
   speed: 17000
 ## Logger:
 ##  file: Logger
