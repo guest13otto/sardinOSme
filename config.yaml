@@ -1,76 +1,64 @@
 Subfolders: [GUI]
-_Joystick:
+Joystick:
   file: Joystick
   varclass: Joystick
   frequency: 100
-_ProfileA:
+ProfileA:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'A'
   max_percentage: 100
   formula_modifier: 30
-_ProfileB:
+ProfileB:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'B'
   max_percentage: 70
   formula_modifier: 50
-_ProfileC:
+ProfileC:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'C'
   max_percentage: 50
   formula_modifier: 50
-_ProfileD:
+ProfileD:
   file: ControlProfile
   varclass: ControlProfile
   frequency: 1
   activate: 'D'
   max_percentage: 30
   formula_modifier: 50
-_ThrusterPower:
+ThrusterPower:
   file: Thruster_Power
   varclass: Thruster_Power
   frequency: 1
-_Thrusters:
+Thrusters:
   file: Thrusters
   varclass: Thrusters
   frequency: 10
 EM1:
-  device: EM1
+  name: EM1
   file: EM
   varclass: EM
   frequency: 1
   address: 0x33
 EM2:
-  device: EM2
-  file: EM
-  varclass: EM
-  frequency: 1
-  address: 1
-_EM1:
-  name: EM1
-  file: EM
-  varclass: EM
-  frequency: 1
-  address: 0x31
-_EM2:
   name: EM2
   file: EM
   varclass: EM
   frequency: 1
   address: 0x32
-_Gripper:
+Gripper:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: gripper
   address: 0x22
   speed: 17000 # 0 - 32767
-_Erector:
+Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
@@ -84,7 +72,7 @@ _Erector:
 ##  Print: True
 ##  Log: True
 ##  Topics: "Thruster" #All Topicss: gamepad, command, Thruster, info, can, log
-_CAN_Handler:
+CAN_Handler:
   file: CAN_Handler
   varclass: CAN_Handler
   frequency: 1
@@ -92,7 +80,7 @@ GUI:
   file: main
   varclass: GUI
   frequency: 30
-TestCaseSend:
+_TestCaseSend:
   file: main
   varclass: TestCaseSend
   frequency: 30
@@ -119,5 +107,5 @@ TestCaseSend:
 #    file: socketpubsub
 #    varclass: spub
 #    frequency: 1
-_Module_Manager:
+Module_Manager:
   terminal_frequency: 150
