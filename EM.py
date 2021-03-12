@@ -27,10 +27,10 @@ class EM(Module):
         print(message)
         if message["tool_state"] == 1:
             self.EM_L += 1
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_L"][list(self.EM_L % 2)]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_L"][self.EM_L % 2]})
         elif message["tool_state"] == -1:
             self.EM_R += 1
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_R"][list(self.EM_R % 2)]})
+            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_R"][self.EM_R % 2]})
 
 class __Test_Case_Send__(Module):
     def __init__(self):

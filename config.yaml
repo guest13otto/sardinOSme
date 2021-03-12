@@ -40,13 +40,13 @@ Thrusters:
   varclass: Thrusters
   frequency: 10
 EM1:
-  name: EM1
+  device: EM1
   file: EM
   varclass: EM
   frequency: 1
   address: 0x33
 EM2:
-  name: EM2
+  device: EM2
   file: EM
   varclass: EM
   frequency: 1
@@ -107,5 +107,5 @@ _TestCaseSend:
 #    file: socketpubsub
 #    varclass: spub
 #    frequency: 1
-Module_Manager:
+_Module_Manager:
   terminal_frequency: 150
