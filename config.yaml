@@ -39,7 +39,6 @@ _Thrusters:
   file: Thrusters
   varclass: Thrusters
   frequency: 10
-<<<<<<< HEAD
 EM1:
   device: EM1
   file: EM
@@ -48,7 +47,10 @@ EM1:
   address: 0x33
 EM2:
   device: EM2
-=======
+  file: EM
+  varclass: EM
+  frequency: 1
+  address: 1
 _EM1:
   name: EM1
   file: EM
@@ -57,7 +59,6 @@ _EM1:
   address: 0x31
 _EM2:
   name: EM2
->>>>>>> 187575cc35e3cc135cfe3a2fad1999d81b32b673
   file: EM
   varclass: EM
   frequency: 1
@@ -91,7 +92,7 @@ GUI:
   file: main
   varclass: GUI
   frequency: 30
-TestCaseSwnd:
+TestCaseSend:
   file: main
   varclass: TestCaseSend
   frequency: 30

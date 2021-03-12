@@ -160,7 +160,10 @@ class ToolsPopup:
             self.tool = self.newTool
 
     def set_em(self, order, message):
-        if message > 0:
+        if message == 0:
+            for i in range(2):
+                self.emStates[order][i] = 0
+        elif message > 0:
             self.emStates[order][0] = not self.emStates[order][0]
         else:
             self.emStates[order][1] = not self.emStates[order][1]

@@ -70,14 +70,14 @@ class TestCaseSend(Module):
     @Async_Task.loop(1)
     async def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
-        pub.sendMessage('Thruster.Power', message={"Thruster_message": self.power})
+        pub.sendMessage('Thruster.Power', message={"Thruster_message": [self.power]})
 
     @Async_Task.loop(0.02)
     async def run4(self):
         topics = ["gripper", "EM1", "EM2", "erector"]
-        hold = [3, 2, 2, 3]
+        hold = [3, 1, 1, 3]
         index = random.randint(0, 3)
-        states = [-1, 1, 0]
+        states = [0, -1, 1]
         pub.sendMessage('gamepad.{}'.format(topics[index]), message={"tool_state": random.choice(states[:hold[index]])})
 
     @Async_Task.loop(0.002)
@@ -86,6 +86,11 @@ class TestCaseSend(Module):
         if flip:
             self.invert = not self.invert
         pub.sendMessage('gamepad.invert', message={"invert": self.invert})
+
+    @Async_Task.loop(0.02)
+    async def run6(self):
+        n = random.randint(1, 2)
+        pub.sendMessage("gamepad.EM{}".format(n), message={"tool_state": random.choice([-1, 1])})
 
 
 if __name__ == "__main__":
