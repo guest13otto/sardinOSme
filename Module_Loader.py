@@ -4,7 +4,7 @@ import os
 
 class Loader():
     @staticmethod
-    def load_all(YAML_File):
+    def loadall(YAML_File):
         nodes = []
         try:
             content = yaml.load(open(str(YAML_File), 'r'), Loader = yaml.FullLoader)

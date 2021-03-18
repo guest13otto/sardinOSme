@@ -111,6 +111,7 @@ class ToolsPopup:
         self.y = 75
         self.tool = -1
         self.newTool = -1
+        self.toolName = ''
         self.toolState = -1
         self.emStates = [[False, False], [False, False]]
         self.labels = ['Gripper', 'EM1', 'EM2', 'Erector']
@@ -126,47 +127,21 @@ class ToolsPopup:
         green = (0, 255, 0)
         self.stateColours = [red, yellow, green]
         self.font = pygame.font.SysFont("Courier New", 16)
-        self.topics = ["gamepad.gripper", "gamepad.EM1", "gamepad.EM2", "gamepad.erector"]
-        for i in range(4):
-            x = eval('self.' + self.topics[i][8:] + '_handler')
-            pub.subscribe(x, self.topics[i])
+        pub.subscribe(self.tool_handler, "joystick.tool_change")
         self.expired = time.time()
 
-    def gripper_handler(self, message):
-        self.newTool = 0
-        self.tool_handler(message)
-
-    def EM1_handler(self, message):
-        self.newTool = 1
-        self.tool_handler(message)
-        self.set_em(0, message["tool_state"])
-
-    def EM2_handler(self, message):
-        self.newTool = 2
-        self.tool_handler(message)
-        self.set_em(1, message["tool_state"])
-
-    def erector_handler(self, message):
-        self.newTool = 3
-        self.tool_handler(message)
-
     def tool_handler(self, message):
-        self.set_tool(message["tool_state"])
+        self.tool = message["index"]
+        self.toolName = message["name"]
 
-    def set_tool(self, message):
-        self.toolState = message
-        if self.tool != self.newTool:
-            self.expired = time.time() + 1
-            self.tool = self.newTool
-
-    def set_em(self, order, message):
+    '''def set_em(self, order, message):
         if message == 0:
             for i in range(2):
                 self.emStates[order][i] = 0
         elif message > 0:
             self.emStates[order][0] = not self.emStates[order][0]
         else:
-            self.emStates[order][1] = not self.emStates[order][1]
+            self.emStates[order][1] = not self.emStates[order][1]'''
 
     def update(self):
         self.surface.fill((1, 1, 1))

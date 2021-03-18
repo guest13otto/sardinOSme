@@ -120,7 +120,8 @@ class Joystick(Module):
         super().__init__()
     
 
-    def change_active_tool(self, tool_index : int): 
+    def change_active_tool(self, tool_index : int):
+        pub.sendMessage("joystick.tool_change", message={"index": tool_index, "name": self.active_tools[tool_index]})
         """
         Automatically handle change of active tool when index to self.active_tools is inputted\n
         self.active_tools = [False, False, False, False] <= Gripper, EM_Left, EM_Right, Erector
