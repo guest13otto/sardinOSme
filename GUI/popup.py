@@ -128,20 +128,29 @@ class ToolsPopup:
         self.stateColours = [red, yellow, green]
         self.font = pygame.font.SysFont("Courier New", 16)
         pub.subscribe(self.tool_handler, "joystick.tool_change")
+        pub.subscribe(self.em1_handler, "gamepad.EM1")
+        pub.subscribe(self.em2_handler, "gamepad.EM2")
         self.expired = time.time()
 
     def tool_handler(self, message):
         self.tool = message["index"]
         self.toolName = message["name"]
+        self.expired = time.time() + 1
 
-    '''def set_em(self, order, message):
+    def em1_handler(self, message):
+        self.set_em(0, message["tool_state"])
+
+    def em2_handler(self, message):
+        self.set_em(1, message["tool_state"])
+
+    def set_em(self, order, message):
         if message == 0:
             for i in range(2):
-                self.emStates[order][i] = 0
+                self.emStates[order][i] = False
         elif message > 0:
             self.emStates[order][0] = not self.emStates[order][0]
         else:
-            self.emStates[order][1] = not self.emStates[order][1]'''
+            self.emStates[order][1] = not self.emStates[order][1]
 
     def update(self):
         self.surface.fill((1, 1, 1))
