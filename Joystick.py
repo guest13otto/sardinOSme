@@ -76,6 +76,7 @@ class Joystick(Module):
         self.active_tool = ""
         self.active_tools = ("gamepad.gripper", "gamepad.EM1", "gamepad.EM2", "gamepad.erector")
         self.bumper_hold = (True, False, False, True)  #Determines if the corresponding active tool requires holding down activation
+        self.em_states ={"gamepad.EM1L": False, "gamepad.EM1R": False, "gamepad.EM2L": False, "gamepad.EM2R":False} 
         self.last_tool = ""
 
         #Inputs
@@ -119,22 +120,46 @@ class Joystick(Module):
         
         super().__init__()
     
+    def em_message(self, tool_state):
+        if tool_state==1:
+            self.em_states[self.active_tool+"L"] = not self.em_states[self.active_tool+"L"]
+        elif tool_state==-1:
+            self.em_states[self.active_tool+"R"] = not self.em_states[self.active_tool+"R"]
+        return {"L": self.em_states[self.active_tool+"L"], "R": self.em_states[self.active_tool+"R"]}
 
-    def change_active_tool(self, tool_index : int):
-        pub.sendMessage("joystick.tool_change", message={"index": tool_index, "name": self.active_tools[tool_index]})
+    def change_active_tool(self, tool_index : int): 
         """
         Automatically handle change of active tool when index to self.active_tools is inputted\n
         self.active_tools = [False, False, False, False] <= Gripper, EM_Left, EM_Right, Erector
-        """
-        if self.active_tool:
-            pub.sendMessage(self.active_tool, message = {"tool_state": 0})
+        """ 
         _new_tool = self.active_tools[tool_index]
-        if self.active_tool == _new_tool:
-            self.active_tool = ""
-        else:
-            self.active_tool = _new_tool
+        self.active_tool = _new_tool
+        pub.sendMessage("gamepad.selected_tool", message = {"tool_name": _new_tool})
+        pub.sendMessage("gamepad.em_states", message = self.em_states)
         self.bumper_hold_on = self.bumper_hold[tool_index]
         self.bumper_hold_default_sent = False
+
+    def tool_action(self):
+        if self.bumper_hold_on:
+            if button_hold(self.lb_input):
+                pub.sendMessage(self.active_tool, message = {"tool_state": 1})
+                #pub.sendMessage(self.active_tool, message = self.hold_message(1))
+
+                self.bumper_hold_default_sent = False
+            elif button_hold(self.rb_input):
+                pub.sendMessage(self.active_tool, message = {"tool_state": -1})
+                #pub.sendMessage(self.active_tool, message = self.hold_message(-1))
+                self.bumper_hold_default_sent = False
+            else:
+                if not self.bumper_hold_default_sent:
+                    pub.sendMessage(self.active_tool, message = {"tool_state": 0})
+                    #pub.sendMessage(self.active_tool, message = self.hold_message(0))
+                    self.bumper_hold_default_sent = True
+        else:
+            if button_pressed(self.lb_input):
+                pub.sendMessage(self.active_tool, message = self.em_message(1))
+            if button_pressed(self.rb_input):
+                pub.sendMessage(self.active_tool, message = self.em_message(-1))
 
 
     @Async_Task.loop(1)
@@ -238,23 +263,10 @@ class Joystick(Module):
         if button_pressed(self.south_input):
             self.change_active_tool(3)
 
-        if self.active_tool: #Check empty string ""
-            if self.bumper_hold_on:
-                if button_hold(self.lb_input):
-                    pub.sendMessage(self.active_tool, message = {"tool_state": 1})
-                    self.bumper_hold_default_sent = False
-                elif button_hold(self.rb_input):
-                    pub.sendMessage(self.active_tool, message = {"tool_state": -1})
-                    self.bumper_hold_default_sent = False
-                else:
-                    if not self.bumper_hold_default_sent:
-                        pub.sendMessage(self.active_tool, message = {"tool_state": 0})
-                        self.bumper_hold_default_sent = True
-            else:
-                if button_pressed(self.lb_input):
-                    pub.sendMessage(self.active_tool, message = {"tool_state": 1})
-                if button_pressed(self.rb_input):
-                    pub.sendMessage(self.active_tool, message = {"tool_state": -1})
+        
+        if self.active_tool:
+            self.tool_action()
+
 
 
 
@@ -275,6 +287,10 @@ if __name__ == "__main__":
         print("gripper: ", message)
     def debug_listener_erector(message):
         print("erector: ", message)
+    def debug_listener_tool_states(message):
+        print("em_state", message)
+    def debug_listener_selected_tool(message):
+        print("selected_tool", message)
 
 
     pub.subscribe(debug_listener_profile, 'gamepad.profile')
@@ -285,6 +301,8 @@ if __name__ == "__main__":
     pub.subscribe(debug_listener_EM1, 'gamepad.EM1')
     pub.subscribe(debug_listener_EM2, 'gamepad.EM2')
     pub.subscribe(debug_listener_erector, 'gamepad.erector')
+    pub.subscribe(debug_listener_tool_states, "gamepad.em_states")
+    pub.subscribe(debug_listener_selected_tool, "gamepad.selected_tool")
     #pub.subscribe(debug_listener_profile, 'gamepad.profile')
     mm = ModuleManager("")
     mm.start(1)
