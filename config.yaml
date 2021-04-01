@@ -77,11 +77,11 @@ _CAN_Handler:
   varclass: CAN_Handler
   frequency: 1
 GUI:
-  file: main
+  file: GUI
   varclass: GUI
   frequency: 30
 _TestCaseSend:
-  file: main
+  file: GUI
   varclass: TestCaseSend
   frequency: 30
 # pubsender:

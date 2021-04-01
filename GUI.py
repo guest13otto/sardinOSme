@@ -59,38 +59,33 @@ class TestCaseSend(Module):
     async def run(self):
         self.movement = [random.uniform(-1.0, 1.0) for i in range(5)]
         self.movement.append(0.000)
-        pub.sendMessage('gamepad.movement', message={"gamepad_message": self.movement})
+        pub.sendMessage("gamepad.movement", message={"gamepad_message": self.movement})
 
     @Async_Task.loop(0.003)
     async def run2(self):
         pArr = ['A', 'B', 'C', 'D']
         self.profile = pArr[random.randint(0, 3)]
-        pub.sendMessage('gamepad.profile', message={"Profile_Dict": self.profile})
+        pub.sendMessage("gamepad.profile", message={"Profile_Dict": self.profile})
 
     @Async_Task.loop(1)
     async def run3(self):
         self.power = [random.uniform(-1.0, 1.0) for i in range(6)]
-        pub.sendMessage('Thruster.Power', message={"Thruster_message": [self.power]})
+        pub.sendMessage("Thruster.Power", message={"Thruster_message": [self.power]})
 
     @Async_Task.loop(0.02)
     async def run4(self):
-        topics = ["gripper", "EM1", "EM2", "erector"]
-        hold = [3, 1, 1, 3]
-        index = random.randint(0, 3)
-        states = [0, -1, 1]
-        pub.sendMessage('gamepad.{}'.format(topics[index]), message={"tool_state": random.choice(states[:hold[index]])})
+        pub.sendMessage("gamepad.selected_tool", message={"tool_index": random.randint(0, 3)})
 
     @Async_Task.loop(0.002)
     async def run5(self):
         flip = random.randint(0, 1)
         if flip:
             self.invert = not self.invert
-        pub.sendMessage('gamepad.invert', message={"invert": self.invert})
+        pub.sendMessage("gamepad.invert", message={"invert": self.invert})
 
     @Async_Task.loop(0.02)
     async def run6(self):
-        n = random.randint(1, 2)
-        pub.sendMessage("gamepad.EM{}".format(n), message={"tool_state": random.choice([-1, 1])})
+        pub.sendMessage("gamepad.em_states", message={"gamepad.EM1L": bool(random.randint(0, 1)), "gamepad.EM1R": bool(random.randint(0, 1)), "gamepad.EM2L": bool(random.randint(0, 1)), "gamepad.EM2R": bool(random.randint(0, 1))})
 
 
 if __name__ == "__main__":

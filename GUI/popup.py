@@ -110,47 +110,28 @@ class ToolsPopup:
         self.x = 100
         self.y = 75
         self.tool = -1
-        self.newTool = -1
-        self.toolName = ''
-        self.toolState = -1
         self.emStates = [[False, False], [False, False]]
         self.labels = ['Gripper', 'EM1', 'EM2', 'Erector']
         self.emLabels = ['OFF', 'ON']
-        self.hold = [True, False, False, True]
         teal = (108, 194, 189)
         blue = (90, 128, 158)
         purple = (124, 121, 162)
         coral = (245, 125, 124)
         self.toolColours = [teal, blue, purple, coral]
-        red = (255, 0, 0)
-        yellow = (255, 255, 0)
-        green = (0, 255, 0)
-        self.stateColours = [red, yellow, green]
         self.font = pygame.font.SysFont("Courier New", 16)
-        pub.subscribe(self.tool_handler, "joystick.tool_change")
-        pub.subscribe(self.em1_handler, "gamepad.EM1")
-        pub.subscribe(self.em2_handler, "gamepad.EM2")
+        pub.subscribe(self.tool_handler, "gamepad.selected_tool")
+        pub.subscribe(self.em_handler, "gamepad.em_states")
         self.expired = time.time()
 
     def tool_handler(self, message):
-        self.tool = message["index"]
-        self.toolName = message["name"]
+        self.tool = message["tool_index"]
         self.expired = time.time() + 1
 
-    def em1_handler(self, message):
-        self.set_em(0, message["tool_state"])
-
-    def em2_handler(self, message):
-        self.set_em(1, message["tool_state"])
-
-    def set_em(self, order, message):
-        if message == 0:
-            for i in range(2):
-                self.emStates[order][i] = False
-        elif message > 0:
-            self.emStates[order][0] = not self.emStates[order][0]
-        else:
-            self.emStates[order][1] = not self.emStates[order][1]
+    def em_handler(self, message):
+        lr = ['L', 'R']
+        for i in range(2):
+            for j in range(2):
+                self.emStates[i][j] = message["gamepad.EM{}{}".format(i+1, lr[j])]
 
     def update(self):
         self.surface.fill((1, 1, 1))
