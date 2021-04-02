@@ -15,8 +15,6 @@ class EM(Module):
         super().__init__()
         self.device = device
         self.address = address
-        self.EM_L = 0
-        self.EM_R = 0
         exec(f"pub.subscribe(self.Listener, 'gamepad.{self.device}')")
 
     @Async_Task.loop(1)
@@ -24,13 +22,9 @@ class EM(Module):
         pass
 
     def Listener(self, message):
-        print(message)
-        if message["tool_state"] == 1:
-            self.EM_L += 1
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_L"][self.EM_L % 2]})
-        elif message["tool_state"] == -1:
-            self.EM_R += 1
-            pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_R"][self.EM_R % 2]})
+        #print(message)
+        pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_L"][1 if message["L"] else 0]})
+        pub.sendMessage("can.send", message = {"address": eval(self.address), "data": EMLRcommand["EM_R"][1 if message["R"] else 0]})
 
 class __Test_Case_Send__(Module):
     def __init__(self):
@@ -38,7 +32,7 @@ class __Test_Case_Send__(Module):
         pub.subscribe(self.Listener, "can.send")
 
     def run(self):
-        pub.sendMessage("gamepad.EM1", message = {"tool_state": 1})
+        pub.sendMessage("gamepad.EM1", message = {"L": True, "R": False})
 
     def Listener(self, message):
         print(message)
