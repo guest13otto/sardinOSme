@@ -147,7 +147,7 @@ class Joystick(Module):
         """ 
         _new_tool = self.active_tools[tool_index]
         self.active_tool = _new_tool
-        pub.sendMessage("gamepad.selected_tool", message = {"tool_name": _new_tool})
+        pub.sendMessage("gamepad.selected_tool", message = {"tool_index": tool_index})
         pub.sendMessage("gamepad.em_states", message = self.em_states)
         self.bumper_hold_on = self.bumper_hold[tool_index]
         self.bumper_hold_default_sent = False
