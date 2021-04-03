@@ -56,6 +56,19 @@ def button_hold(button_record):
     else:
         return False
 
+def buttons_pressed(*button_records: "list[float, float]", all = False):
+    if all:
+        if False in [button_pressed(button_record) for button_record in button_records]:
+            return False
+        else:
+            return True
+    else:
+        if True in [button_pressed(button_record) for button_record in button_records]:
+            return True
+        else:
+            return False
+    
+
 
 class Joystick(Module):
     def __init__(self):
@@ -134,7 +147,7 @@ class Joystick(Module):
         """ 
         _new_tool = self.active_tools[tool_index]
         self.active_tool = _new_tool
-        pub.sendMessage("gamepad.selected_tool", message = {"tool_index": tool_index})
+        pub.sendMessage("gamepad.selected_tool", message = {"tool_name": _new_tool})
         pub.sendMessage("gamepad.em_states", message = self.em_states)
         self.bumper_hold_on = self.bumper_hold[tool_index]
         self.bumper_hold_default_sent = False
@@ -158,8 +171,10 @@ class Joystick(Module):
         else:
             if button_pressed(self.lb_input):
                 pub.sendMessage(self.active_tool, message = self.em_message(1))
+                pub.sendMessage("gamepad.em_states", message = self.em_states)
             if button_pressed(self.rb_input):
                 pub.sendMessage(self.active_tool, message = self.em_message(-1))
+                pub.sendMessage("gamepad.em_states", message = self.em_states)
 
 
     @Async_Task.loop(1)
@@ -265,6 +280,7 @@ class Joystick(Module):
 
         
         if self.active_tool:
+            #if buttons_pressed(self.north_input, self.south_input, self.west_input, self.east_input, all = False):
             self.tool_action()
 
 
