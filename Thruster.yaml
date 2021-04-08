@@ -1,5 +1,5 @@
 
-CG: 0,0,0
+CG: 0,0,0.03
 rate: 1.3
 ThrusterFL:
   Name: ThrusterFL
