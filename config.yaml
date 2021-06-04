@@ -56,15 +56,15 @@ Gripper:
   varclass: Gripper
   frequency: 1
   device: gripper
-  address: 0x22
-  speed: 17000 # 0 - 32767
+  address: 0x21
+  speed: 10000 # 0 - 32767
 Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: erector
-  address: 0x21
-  speed: 17000
+  address: 0x22
+  speed: 15000
 ## Logger:
 ##  file: Logger
 ##  varclass: Logger
