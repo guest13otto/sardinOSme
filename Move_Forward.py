@@ -4,9 +4,10 @@ from pubsub import pub
 
 
 class Move_Forward(Module):
-    def __init__(self, seconds, power):
+    def __init__(self, start_countdown, duration, power):
         super().__init__()
-        self.seconds = float(seconds)
+        self.start_countdown = float(start_countdown)
+        self.duration = float(duration)
         self.start_time = False
         self.movement_message = (0, float(power), 0, 0, 0, 0)
         pub.subscribe(self.start_listener, "gamepad.move_forward")
@@ -19,9 +20,12 @@ class Move_Forward(Module):
 
     @Async_Task.loop(1)
     async def run(self):
+        elapsed_time = time.time()-self.start_time
         if not self.start_time:
             pub.sendMessage("moveforward.stop", message = {"stop": True})
-        elif time.time()-self.start_time < self.seconds:
+        elif elapsed_time < self.start_countdown:
+            pass
+        elif elapsed_time < self.duration+self.start_countdown:
             pub.sendMessage("gamepad.movement", message = {"gamepad_message": self.movement_message})
         else:
             pub.sendMessage("moveforward.stop", message = {"stop": True})

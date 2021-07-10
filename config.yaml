@@ -84,7 +84,8 @@ MoveForward:
   file: Move_Forward
   varclass: Move_Forward
   frequency: 10
-  seconds: 5
+  start_countdown: 3
+  duration: 10
   power: 1
 _TestCaseSend:
   file: GUI
