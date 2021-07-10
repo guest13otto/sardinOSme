@@ -1110,9 +1110,9 @@ class ModuleManager(Module, tk.Tk):
 
 
             #GUI
-            os.environ['SDL_WINDOWID'] = str(self.GUI.winfo_id())
-            if platform.system == "Windows":
-                os.environ['SDL_VIDEODRIVER'] = 'windib'
+            #os.environ['SDL_WINDOWID'] = str(self.GUI.winfo_id())
+            #if platform.system == "Windows":
+            #    os.environ['SDL_VIDEODRIVER'] = 'windib'
 
 
     def __task_code_gen(self):

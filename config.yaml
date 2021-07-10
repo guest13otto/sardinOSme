@@ -64,7 +64,7 @@ Erector:
   frequency: 1
   device: erector
   address: 0x22
-  speed: 15000
+  speed: 10000
 ## Logger:
 ##  file: Logger
 ##  varclass: Logger
@@ -80,6 +80,12 @@ GUI:
   file: GUI
   varclass: GUI
   frequency: 30
+MoveForward:
+  file: Move_Forward
+  varclass: Move_Forward
+  frequency: 10
+  seconds: 5
+  power: 1
 _TestCaseSend:
   file: GUI
   varclass: TestCaseSend

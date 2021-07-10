@@ -83,6 +83,7 @@ class Joystick(Module):
         except:
             raise TypeError("No joystick connected")
         self.joystick.init()
+        pub.subscribe(self.move_forward_listener, "moveforward.stop")
 
 
         #Active Tool Modes
@@ -112,6 +113,7 @@ class Joystick(Module):
 
         #State variables
         self.control_invert = False
+        self.move_forward = False
         self.new_movement_message = [0, 0, 0, 0, 0, 0]
         self.movement_message = [0, 0, 0, 0, 0, 0]  #strafe, drive, yaw, updown, tilt, 0
         self.direct_input = [0, 0, 0, 0, 0, 0]
@@ -132,6 +134,9 @@ class Joystick(Module):
 
         
         super().__init__()
+
+    def move_forward_listener(self, message):
+        self.move_forward = False
     
     def em_message(self, tool_state):
         if tool_state==1:
@@ -253,7 +258,8 @@ class Joystick(Module):
     async def pub_loop(self):
         if self.new_movement_message != self.movement_message:
             self.movement_message = self.new_movement_message[:]
-        pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
+        if not self.move_forward:
+            pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
 
         if button_pressed(self.l_stick_input):
             self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%len(ProfileChars)
@@ -265,6 +271,10 @@ class Joystick(Module):
         if button_pressed(self.x_input):
             self.control_invert = not self.control_invert
             pub.sendMessage("gamepad.invert", message = {"invert": self.control_invert}) #For GUI
+
+        if button_pressed(self.a_input):
+            self.move_forward = not self.move_forward
+            pub.sendMessage("gamepad.move_forward", message = {"start": self.move_forward})
 
         if button_pressed(self.north_input):
             self.change_active_tool(0)
