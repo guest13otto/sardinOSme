@@ -56,14 +56,14 @@ Gripper:
   varclass: Gripper
   frequency: 1
   device: gripper
-  address: 0x21
+  address: 0x22
   speed: 10000 # 0 - 32767
 Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: erector
-  address: 0x22
+  address: 0x21
   speed: 10000
 ## Logger:
 ##  file: Logger
@@ -84,7 +84,7 @@ MoveForward:
   file: Move_Forward
   varclass: Move_Forward
   frequency: 10
-  start_countdown: 3
+  start_countdown: 0.5
   duration: 10
   power: 1
 _TestCaseSend:
