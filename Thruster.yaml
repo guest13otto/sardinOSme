@@ -1,5 +1,5 @@
 
-CG: 0,0,0.03
+CG: 0,0,0
 rate: 1.3
 ThrusterFL:
   Name: ThrusterFL
@@ -45,19 +45,19 @@ ThrusterUF:
   Name: ThrusterUF
   Address: 0x1E
   Invert: False
-  Position: 0,0.182,0.097
+  Position: 0,0.182,0.056
   Direction: 0,0,1
   Scale: 2.65
   PositiveScale: 0.9
-  NegativeScale: 1.45
+  NegativeScale: 0.9
   Deadzone: 0.1
 ThrusterUB:
   Name: ThrusterUB
-  Address: 0x15
-  Invert: False
-  Position: 0,-0.182,0.097
+  Address: 0x1D
+  Invert: True
+  Position: 0,-0.182,0.056
   Direction: 0,0,1
   Scale: 2.65
   PositiveScale: 0.9
-  NegativeScale: 1.45
+  NegativeScale: 0.9
   Deadzone: 0.1
