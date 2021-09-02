@@ -64,7 +64,7 @@ Erector:
   frequency: 1
   device: erector
   address: 0x21
-  speed: 10000
+  speed: 8000
 ## Logger:
 ##  file: Logger
 ##  varclass: Logger
