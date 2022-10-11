@@ -24,11 +24,15 @@ class Joystick(Module):
     async def get_joystick(self):
         ## KEEEP
         pygame.event.pump()
+        '''
         self.c += 0.01
         if self.c >=1:
             self.c = -1
         pub.sendMessage("gamepad.movement", message = {"gamepad_message": [self.c,0,0,0,0,0]})
-
+        '''
+        ##yo this is Matthew from 2022 october, this is trhe function for the sensing of everything in the joystick. flip later
+        pub.sendMessage("gamepad.movement", message = {"gamepad_message": [joystick.get_axis(i) for i in range(joystick.get_numaxes())]}) ##value of axis, both stick(0, 1, 2, 3) and analog stick(4, 5) may cahnge according to console
+        
 
 
 if __name__ == "__main__":
