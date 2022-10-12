@@ -31,8 +31,13 @@ class Joystick(Module):
         pub.sendMessage("gamepad.movement", message = {"gamepad_message": [self.c,0,0,0,0,0]})
         '''
         ##yo this is Matthew from 2022 october, this is trhe function for the sensing of everything in the joystick. flip later
-        pub.sendMessage("gamepad.movement", message = {"gamepad_message": [joystick.get_axis(i) for i in range(joystick.get_numaxes())]}) ##value of axis, both stick(0, 1, 2, 3) and analog stick(4, 5) may cahnge according to console
-        
+        self.axis_value = [self.joystick.get_axis(i) for i in range(self.joystick.get_numaxes())]
+        self.deadband = 0.2 #pretty much sensitivity
+        for i in range(4): #sensitivty applying only 4 axis bcs 5 and 6 is anbalog and no need for that.
+            if abs(self.axis_value[i]) <= self.deadband:
+                self.axis_value[i] = 0
+        pub.sendMessage("gamepad.movement", message = {"gamepad_message": [self.axis_value[0], -self.axis_value[1], self.axis_value[2], (self.axis_value[4]) - (self.axis_value[5]),  -1 * self.axis_value[3], 0]}) ##value of axis, both stick(0, 1, 2, 3) and analog stick(4, 5) may cahnge according to console
+        #this is the list, (strafe(left x axis), drive(left y axis), yaw(right x axis), updown(analog stick), tilt(right y axis reversed), 0) may change depending on pilot
 
 
 if __name__ == "__main__":

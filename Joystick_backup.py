@@ -260,7 +260,7 @@ class Joystick(Module):
             self.movement_message = self.new_movement_message[:]
         if not self.move_forward:
             pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
-
+            
         if button_pressed(self.l_stick_input):
             self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%len(ProfileChars)
             pub.sendMessage("gamepad.profile", message = {"Profile_Dict": ProfileChars[self.thumb_profile_cycle]})

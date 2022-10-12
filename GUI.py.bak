@@ -17,15 +17,34 @@ class GUI(Module):
         self.screen_height = 300
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
-        pub.subscribe(self.movement_handler, "gamepad.movement")
-        
+        self.plot = Plot(self.screen, 400, 300)
+        self.movement = [0 for i in range(6)]
+        self.power = [0 for i in range(6)]
+        self.profile = -1
+
+        self.widgets = []
+        self.widgets.append((ProfilePopup(self.screen_width, self.screen_height), (0, 0)))
+        self.widgets.append((InvertPopup(self.screen_width, self.screen_height), (0, 0)))
+        self.widgets.append((ToolsPopup(self.screen_width, self.screen_height), (0, 0)))
+
+        self.charts = []
+        self.charts.append((Plot(['strafe', 'drive', 'yaw', 'ud', 'tilt', 'zero'], self.screen_width, self.screen_height), (0, 0), 0))
+        self.charts.append((Plot(['FL', 'FR', 'BL', 'BR', 'TL', 'TR'], self.screen_width, self.screen_height), (self.screen_width/2, 0), 1))
+
     @Async_Task.loop(1)
     async def run(self):
         self.clock.tick(30)
-        print("gui: movement dump", self.movement)
 
-    def movement_handler(self, message):
-        self.movement = message["gamepad_message"]
+        for chart in self.charts:
+            pygame.display.get_surface().blit(chart[0].update(chart[2]), chart[1])
+
+        for widget in self.widgets:
+            pygame.display.get_surface().blit(widget[0].update(), widget[1])
+
+        pygame.display.flip()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
 
 
 class TestCaseSend(Module):
