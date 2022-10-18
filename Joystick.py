@@ -36,7 +36,9 @@ class Joystick(Module):
         for i in range(4): #sensitivty applying only 4 axis bcs 5 and 6 is anbalog and no need for that.
             if abs(self.axis_value[i]) <= self.deadband:
                 self.axis_value[i] = 0
-        pub.sendMessage("gamepad.movement", message = {"gamepad_message": [self.axis_value[0], -self.axis_value[1], self.axis_value[2], (self.axis_value[4]) - (self.axis_value[5]),  -1 * self.axis_value[3], 0]}) ##value of axis, both stick(0, 1, 2, 3) and analog stick(4, 5) may cahnge according to console
+        pub.sendMessage("gamepad.movement", message = {"gamepad_message": [self.axis_value[0], -self.axis_value[1], self.axis_value[2], (self.axis_value[4]) - (self.axis_value[5]),  -1 * self.axis_value[3], 0]})
+        pub.sendMessage("quit", message = self.joystick.get_button(7) )
+         ##value of axis, both stick(0, 1, 2, 3) and analog stick(4, 5) may cahnge according to console
         #this is the list, (strafe(left x axis), drive(left y axis), yaw(right x axis), updown(analog stick), tilt(right y axis reversed), 0) may change depending on pilot
 
 

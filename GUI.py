@@ -13,19 +13,39 @@ class GUI(Module):
         super().__init__()
         pygame.init()
         pygame.display.set_caption("ControlGUI(UWU")
-        self.screen_width = 400
-        self.screen_height = 300
+        #teal = (108, 194, 189)
+        #blue = (90, 128, 158)
+        #purple = (124, 121, 162)
+        #coral = (245, 125, 124)
+        #self.colours = [teal, blue, purple, coral]
+        green = (0, 255, 0)
+        yellow = (255, 255, 0)
+        red = (255, 0, 0)
+        blue = (0, 0, 255)
+        ##colors
+        self.screen_width = 2000
+        self.screen_height = 1000
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
         pub.subscribe(self.movement_handler, "gamepad.movement")
+        pub.subscribe(self.quitter, "quit")
+        
+    def quitter(self, message):
+        if message == 1:
+            pygame.quit()
+        else: 
+            pass
         
     @Async_Task.loop(1)
     async def run(self):
         self.clock.tick(30)
-        print("gui: movement dump", self.movement)
-
+        self.screen.fill((91, 143, 227))
+        pygame.draw.circle(self.screen, (255, 255, 255), (500+(50*self.movement[0]), 500+(50*self.movement[1])), 50, 0)
+        pygame.display.flip()
     def movement_handler(self, message):
         self.movement = message["gamepad_message"]
+
+
 
 
 class TestCaseSend(Module):
