@@ -47,7 +47,7 @@ EM1:
   file: EM
   varclass: EM
   frequency: 1
-  address: 0x30
+  address: 0x35
 EM2:
   name: EM2
   file: EM
