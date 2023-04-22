@@ -22,7 +22,7 @@ class Thrusters(Module):
     def __init__ (self):
         super().__init__()
         try:
-            content = yaml.load(open('Thruster.yaml', 'r'), Loader = yaml.FullLoader)
+            content = yaml.load(open('Thruster_Hydron.yaml', 'r'), Loader = yaml.FullLoader)
             for key,value in content.items():
                 exec(f"self.{key} = value")
         except FileNotFoundError:

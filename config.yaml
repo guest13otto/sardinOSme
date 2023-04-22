@@ -44,27 +44,29 @@ EM1:
   file: EM
   varclass: EM
   frequency: 1
-  address: 0x30
+  address: 0x32
 EM2:
   device: EM2
   file: EM
   varclass: EM
   frequency: 1
-  address: 0x32
+  address: 0x30
 Gripper:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: gripper
-  address: 0x22
+  address: 0x23
   speed: 10000 # 0 - 32767
+  flip: 0
 Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: erector
-  address: 0x21
+  address: 0x22
   speed: 8000
+  flip: 1
 ## Logger:
 ##  file: Logger
 ##  varclass: Logger
@@ -84,9 +86,9 @@ MoveForward:
   file: Move_Forward
   varclass: Move_Forward
   frequency: 10
-  start_countdown: 0.5
+  start_countdown: 0
   duration: 10
-  power: 1
+  power: -1
 _TestCaseSend:
   file: GUI
   varclass: TestCaseSend

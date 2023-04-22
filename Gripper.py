@@ -3,9 +3,10 @@ from pubsub import pub
 import asyncio
 
 class Gripper(Module):
-    def __init__(self, device, address, speed):
+    def __init__(self, device, address, speed, flip):
         super().__init__()
         self.device = device
+        self.flip = int(flip)
         self.speed = int(speed)
         self.address = address
         exec(f'pub.subscribe(self.Listener, "gamepad.{self.device}")')
@@ -15,9 +16,14 @@ class Gripper(Module):
         pass
 
     def Listener(self, message):
-        if message["tool_state"] == 1:
+        tool_state = message["tool_state"]
+
+        if self.flip:
+            tool_state = -tool_state
+
+        if tool_state == 1:
             pub.sendMessage('can.send', message = {"address": eval(self.address), "data": [32, self.speed >> 8 & 0xff, self.speed & 0xff]})
-        elif message["tool_state"] == -1:
+        elif tool_state == -1:
             pub.sendMessage('can.send', message = {"address": eval(self.address), "data": [32, -self.speed >> 8 & 0xff, -self.speed & 0xff]})
         else:
             pub.sendMessage('can.send', message = {"address": eval(self.address), "data": [32, 0x00, 0x00]})

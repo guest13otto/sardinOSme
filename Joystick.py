@@ -234,9 +234,9 @@ class Joystick(Module):
         RUD = -1*deadzoneright(RUD)
         BLR = -1*deadzone_back(BLR)
         if self.control_invert:
-            self.new_movement_message = [-LLR, -LUD, -RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
+            self.new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
         else:
-            self.new_movement_message = [ LLR,  LUD, -RLR, BLR,  RUD, 0]
+            self.new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]
 
 
     @Async_Task.loop(1, condition = "platform.system() == 'Linux'")
