@@ -9,7 +9,7 @@ class Move_Forward(Module):
         self.start_countdown = float(start_countdown)
         self.duration = float(duration)
         self.start_time = False
-        self.movement_message = (0, float(power), 0, 0, 0, 0)
+        self.movement_message = (0, -float(power), 0.04, 0, -0.6, 0)
         pub.subscribe(self.start_listener, "gamepad.move_forward")
 
     def start_listener(self, message):

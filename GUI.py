@@ -13,11 +13,11 @@ class GUI(Module):
         super().__init__()
         pygame.init()
         pygame.display.set_caption("ControlGUI(UWU")
-        self.screen_width = 400
-        self.screen_height = 300
+        self.screen_width = 800
+        self.screen_height = 600
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         self.clock = pygame.time.Clock()
-        self.plot = Plot(self.screen, 400, 300)
+        self.plot = Plot(self.screen, 800, 600)
         self.movement = [0 for i in range(6)]
         self.power = [0 for i in range(6)]
         self.profile = -1

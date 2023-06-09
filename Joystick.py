@@ -234,9 +234,9 @@ class Joystick(Module):
         RUD = -1*deadzoneright(RUD)
         BLR = -1*deadzone_back(BLR)
         if self.control_invert:
-            self.new_movement_message = [-LLR, -LUD, RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
+            self.new_movement_message = [-LLR, -LUD, -RLR, BLR, -RUD, 0]       #(strafe, drive, yaw, updown, tilt, 0)
         else:
-            self.new_movement_message = [ LLR,  LUD, RLR, BLR,  RUD, 0]
+            self.new_movement_message = [ LLR,  LUD, -RLR, BLR,  RUD, 0]
 
 
     @Async_Task.loop(1, condition = "platform.system() == 'Linux'")
@@ -260,7 +260,7 @@ class Joystick(Module):
             self.movement_message = self.new_movement_message[:]
         if not self.move_forward:
             pub.sendMessage("gamepad.movement", message = {"gamepad_message":self.movement_message})
-
+            
         if button_pressed(self.l_stick_input):
             self.thumb_profile_cycle = (self.thumb_profile_cycle-1)%len(ProfileChars)
             pub.sendMessage("gamepad.profile", message = {"Profile_Dict": ProfileChars[self.thumb_profile_cycle]})
