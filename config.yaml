@@ -39,6 +39,12 @@ Thrusters:
   file: Thrusters
   varclass: Thrusters
   frequency: 10
+Led:
+  device: Led
+  file: Led
+  varclass: Led
+  frequency: 1
+  address: 0x61
 EM1:
   device: EM1
   file: EM

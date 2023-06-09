@@ -276,6 +276,10 @@ class Joystick(Module):
             self.move_forward = not self.move_forward
             pub.sendMessage("gamepad.move_forward", message = {"start": self.move_forward})
 
+        if button_pressed(self.y_input):
+            self.move_forward = not self.move_forward
+            pub.sendMessage("gamepad.Led", message = {})
+
         if button_pressed(self.north_input):
             self.change_active_tool(0)
 
