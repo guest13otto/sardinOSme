@@ -52,22 +52,20 @@ EM2:
   frequency: 1
   address: 0x35
 Gripper:
-  file: Servo
-  varclass: Servo
-  frequency: 16
+  file: Gripper
+  varclass: Gripper
+  frequency: 1
   device: gripper
-  address: 0x44
-  increment: 24
-  pos: 1100
-  minimum: 884
-  maximum: 1208
+  address: 0x21
+  speed: 8000
+  flip: 1
 Erector:
   file: Gripper
   varclass: Gripper
   frequency: 1
   device: erector
   address: 0x23
-  speed: 8000
+  speed: 6000
   flip: 1
 ## Logger:
 ##  file: Logger
@@ -114,7 +112,7 @@ _TestCaseSend:
 #    file: pubsender
 #    varclass: pubreceiver
 #    frequency: 1
-# spub:
+x# spub:
 #    file: socketpubsub
 #    varclass: spub
 #    frequency: 1
